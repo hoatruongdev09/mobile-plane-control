@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - plane
+  - endPoint
+  - airPort
+  - barrier
+  - obstacle
+  - hurricane
+  - enemy
+  - cloud
+  - forestfire
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - plane
+  - point
+  - airport
+  - border
+  - enemy
+  - bullet
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: airport
+    uniqueID: 3562838917
+    locked: 0
+  - name: shadow
+    uniqueID: 2896744853
+    locked: 0
+  - name: hurricane
+    uniqueID: 148770615
+    locked: 0
+  - name: line
+    uniqueID: 628275211
+    locked: 0
+  - name: endpoint
+    uniqueID: 606819957
+    locked: 0
+  - name: plane
+    uniqueID: 1793813509
+    locked: 0
+  - name: UI_world
+    uniqueID: 2093096621
+    locked: 0

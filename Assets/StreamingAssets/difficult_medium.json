@@ -1,0 +1,13 @@
+{
+    "spawnPlaneInterval": 10,
+    "maxPlaneInTime": 5,
+    "spawnCloudInterval": 8,
+    "maxCloudInTime": 4,
+    "spawnEnemyPlaneInterval": 20,
+    "maxEnemyInTime": 3,
+    "spawnHurricaneInterval": 8,
+    "maxHurricaneInTime": 4,
+    "spawnForestFireInterval": 10,
+    "maxForestFireInTime": 3,
+    "chanceToLowFuel": 20
+}
