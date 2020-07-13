@@ -46,10 +46,9 @@ public class GameControl : MonoBehaviour {
         if (isGameOver) {
             return;
         }
-        if (Time.timeScale != 1) {
+        Time.timeScale += 0.5f;
+        if (Time.timeScale >= 4) {
             Time.timeScale = 1;
-        } else {
-            Time.timeScale = 1.5f;
         }
     }
 

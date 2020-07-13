@@ -43,7 +43,7 @@ public class InGameUIControl : MonoBehaviour {
             SpawnManager.Instance.isShowTutor = true;
         } else {
             SpawnManager.Instance.isShowTutor = false;
-            panel_tutor.SetActive (false);
+            panel_tutor?.SetActive (false);
         }
         StartCoroutine (DelayInit ());
     }
