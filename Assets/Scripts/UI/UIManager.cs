@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using GooglePlayGames;
+// using GooglePlayGames;
 using UnityEngine;
 using UnityEngine.UI;
 

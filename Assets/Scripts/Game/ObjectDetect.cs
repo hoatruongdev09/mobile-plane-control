@@ -21,6 +21,7 @@ public class ObjectDetect : MonoBehaviour {
         //PC_Control ();
         New_PcControl ();
     }
+
     private void New_PcControl () {
         if (Input.GetMouseButtonDown (0)) {
             isMouseDown = true;
