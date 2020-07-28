@@ -35,10 +35,10 @@ public class Landing : FolllowPath {
     private void AnimateHide () {
         if (isHiding) { return; }
         isHiding = true;
-        Color graphicColor = controller.graphic.color;
         LeanTween.value (transform.gameObject, 1, 0, 2f).setOnUpdate ((float value) => {
-            graphicColor.a = value;
-            controller.graphic.color = graphicColor;
+            foreach (var graphic in controller.graphics) {
+                graphic.color = new Color (graphic.color.r, graphic.color.g, graphic.color.b, value);
+            }
         }).setOnComplete (() => {
             GameController.Instance.OnPlaneLanding (controller);
         });
@@ -47,7 +47,7 @@ public class Landing : FolllowPath {
         transform.LeanScale (Vector3.one * 0.5f, 1f);
         var startSpeed = controller.MoveSpeed;
         var endSpeed = controller.MoveSpeed * .75f;
-        LeanTween.value (transform.gameObject, startSpeed, endSpeed / 2, 2f).setOnUpdate ((float value) => {
+        LeanTween.value (transform.gameObject, startSpeed, endSpeed, 2f).setOnUpdate ((float value) => {
             controller.MoveSpeed = value;
         });
         Color lineColor = controller.Path.lineVisual.startColor;

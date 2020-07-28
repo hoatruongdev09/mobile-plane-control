@@ -28,6 +28,9 @@ public class UIManager : MonoBehaviour {
         }
 
     }
+    public void Button_Quit () {
+        uiItems.panel_Quit.GetComponent<PanelQuitConfirm> ().Show ();
+    }
     public void Button_Play () {
         StartCoroutine (DelayToOpenLevelMenu ());
 

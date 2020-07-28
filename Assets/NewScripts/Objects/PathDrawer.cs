@@ -2,12 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class PathDrawer : MonoBehaviour {
+    public int maxPointDraw = 100;
     public LayerMask detectPlaneLayerMask;
     public LayerMask detectEndpointLayerMask;
     public LayerMask detectAirportLayerMask;
 
-    public void DrawPath (NewScript.Path path, Vector3 position) {
+    public void DrawPath (NewScript.Path path, Vector3 position, System.Action maxPointReach = null) {
         if (path == null) { return; }
+        if (path.CurrentPointCount >= maxPointDraw) {
+            if (maxPointReach != null) {
+                maxPointReach ();
+            }
+            return;
+        }
         path.AddPoint (position);
     }
     public Airport DetectAirport (Vector3 worldPosition) {

@@ -2,36 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColliderChecker : MonoBehaviour {
+public class ColliderChecker : MonoBehaviour, ICollideChecker {
     public ICollisionCheckerDelegate CollisionCheckerDelegate { get; set; }
     public ITriggerCheckerDelegate TriggerCheckerDelegate { get; set; }
     public object OwnedInfo { get; set; }
     private void OnCollisionEnter2D (Collision2D other) {
-        CollisionCheckerDelegate?.OnCollisionEnter2D (this, other);
+        CollisionCheckerDelegate?.OnCheckerCollisionEnter2D (this, other);
     }
     private void OnCollisionExit2D (Collision2D other) {
-        CollisionCheckerDelegate?.OnCollisionExit2D (this, other);
+        CollisionCheckerDelegate?.OnCheckerCollisionExit2D (this, other);
     }
     private void OnCollisionStay2D (Collision2D other) {
-        CollisionCheckerDelegate?.OnCollisionStay2D (this, other);
+        CollisionCheckerDelegate?.OnCheckerCollisionStay2D (this, other);
     }
     private void OnTriggerEnter2D (Collider2D other) {
-        TriggerCheckerDelegate?.OnTriggerEnter2D (this, other);
+        TriggerCheckerDelegate?.OnCheckerTriggerEnter2D (this, other);
     }
     private void OnTriggerStay2D (Collider2D other) {
-        TriggerCheckerDelegate?.OnTriggerStay2D (this, other);
+        TriggerCheckerDelegate?.OnCheckerTriggerStay2D (this, other);
     }
     private void OnTriggerExit2D (Collider2D other) {
-        TriggerCheckerDelegate?.OnTriggerStay2D (this, other);
+        TriggerCheckerDelegate?.OnCheckerTriggerExit2D (this, other);
     }
 }
+public interface ICollideChecker {
+    ICollisionCheckerDelegate CollisionCheckerDelegate { get; set; }
+    ITriggerCheckerDelegate TriggerCheckerDelegate { get; set; }
+    object OwnedInfo { get; set; }
+}
 public interface ICollisionCheckerDelegate {
-    void OnCollisionEnter2D (ColliderChecker checker, Collision2D other);
-    void OnCollisionExit2D (ColliderChecker checker, Collision2D other);
-    void OnCollisionStay2D (ColliderChecker checker, Collision2D other);
+    void OnCheckerCollisionEnter2D (ColliderChecker checker, Collision2D other);
+    void OnCheckerCollisionExit2D (ColliderChecker checker, Collision2D other);
+    void OnCheckerCollisionStay2D (ColliderChecker checker, Collision2D other);
 }
 public interface ITriggerCheckerDelegate {
-    void OnTriggerEnter2D (ColliderChecker checker, Collider2D other);
-    void OnTriggerStay2D (ColliderChecker checker, Collider2D other);
-    void OnTriggerExit2D (ColliderChecker checker, Collider2D other);
+    void OnCheckerTriggerEnter2D (ColliderChecker checker, Collider2D other);
+    void OnCheckerTriggerStay2D (ColliderChecker checker, Collider2D other);
+    void OnCheckerTriggerExit2D (ColliderChecker checker, Collider2D other);
 }

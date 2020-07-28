@@ -57,7 +57,7 @@ public class Plane : MonoBehaviour {
             warner.transform.Rotate (0, 0, 360 * Time.deltaTime);
             if (!warnedSound) {
                 warnedSound = true;
-                InGameSoundManager.Instance.PlayWarningSound ();
+                InGameSoundManager.Instance?.PlayWarningSound ();
             }
         } else {
             warner.gameObject.SetActive (false);
@@ -105,7 +105,7 @@ public class Plane : MonoBehaviour {
                 TriggerGameOver ();
             } else {
                 Debug.Log ("blow effect required");
-                InGameSoundManager.Instance.PlayCrashSound ();
+                InGameSoundManager.Instance?.PlayCrashSound ();
                 SpawnManager.Instance.SpawnBlowEffect (transform.position);
                 Destroy (gameObject);
             }
@@ -118,7 +118,7 @@ public class Plane : MonoBehaviour {
                 TriggerGameOver ();
             } else {
                 Debug.Log ("blow effect required");
-                InGameSoundManager.Instance.PlayCrashSound ();
+                InGameSoundManager.Instance?.PlayCrashSound ();
                 SpawnManager.Instance.SpawnBlowEffect (transform.position);
                 Destroy (gameObject);
             }
@@ -127,7 +127,7 @@ public class Plane : MonoBehaviour {
     public void TriggerGameOver () {
         isCollided = true;
         Time.timeScale = 0;
-        InGameSoundManager.Instance.PlayCrashSound ();
+        InGameSoundManager.Instance?.PlayCrashSound ();
         GameControl.Instance.OnGameOver ();
         StartCoroutine (DestroyAfter (3f));
     }

@@ -267,7 +267,7 @@ public class Line : MonoBehaviour {
         if (!islanding) {
             islanding = true;
             ScoreManager.Instance.AddScore ();
-            InGameSoundManager.Instance.PlayASound (InGameSoundManager.Instance.ac_landedSound);
+            InGameSoundManager.Instance?.PlayASound (InGameSoundManager.Instance.ac_landedSound);
             SpawnManager.Instance.SpawnGreetText (transform.position);
             GetComponent<CircleCollider2D> ().isTrigger = true;
             if (GetComponent<Ally> ()) {

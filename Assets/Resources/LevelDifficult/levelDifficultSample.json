@@ -1,0 +1,15 @@
+{
+  "planeCreateInterval": 15,
+  "maxPlaneInTime": 10,
+  "cloudCreateInterval": 8,
+  "maxCloudInTime": 4,
+  "enemyCreateInterval": 20,
+  "maxEnemyInTime": 3,
+  "createTornadoInterval": 8,
+  "maxTornadoInTime": 3,
+  "createFireInterval": 10,
+  "maxFireInTime": 5,
+  "lowFuelChance": 25,
+  "fuelTimeRangeMin": 15,
+  "fuelTimeRangeMax": 20
+}

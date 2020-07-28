@@ -12,7 +12,7 @@ public class GameState : State {
     }
 
     public virtual void Enter (object options) {
-
+        Enter ();
     }
 
     public virtual void Exit () {
@@ -20,7 +20,7 @@ public class GameState : State {
     }
 
     public virtual void Exit (object options) {
-
+        Exit ();
     }
 
     public virtual void Reset () {

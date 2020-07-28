@@ -5,6 +5,7 @@
     public GameInitState InitState { get; private set; }
     public GameStartedState StartedState { get; private set; }
     public GamePauseState PauseState { get; private set; }
+    public GameOverState OverState { get; private set; }
 
     public GameStateManager (GameController gameController, StateMachine stateMachine) {
         this.GameController = gameController;
@@ -16,5 +17,6 @@
         InitState = new GameInitState (this);
         StartedState = new GameStartedState (this);
         PauseState = new GamePauseState (this);
+        OverState = new GameOverState (this);
     }
 }

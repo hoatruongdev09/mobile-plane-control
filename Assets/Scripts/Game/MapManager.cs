@@ -27,7 +27,9 @@ public class MapManager : MonoBehaviour {
 		float sizeX = sizeY * cam.aspect;
 		trueScreenSize = new Vector2 (sizeX, sizeY);
 		mapSize = trueScreenSize + new Vector2 (mapOffset, mapOffset);
-		mapBackground.size = mapSize;
+		if (mapBackground) {
+			mapBackground.size = mapSize;
+		}
 	}
 	private void SetUpEdgeCollider () {
 		edgeCollider2D = GetComponent<EdgeCollider2D> ();

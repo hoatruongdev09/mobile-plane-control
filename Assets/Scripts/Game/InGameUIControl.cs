@@ -160,7 +160,7 @@ public class InGameUIControl : MonoBehaviour {
         }
     }
     private void DoTextAnimation (int number, Text textObject) {
-
+        Debug.Log ($"do text animation: ${number}");
         // LeanTween.cancel (this.gameObject);
         if (number >= multiplier * 10) {
             Debug.Log (number + ">=" + multiplier * 10);

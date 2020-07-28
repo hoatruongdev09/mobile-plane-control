@@ -12,6 +12,7 @@ public class UIItems : MonoBehaviour {
     public GameObject panel_LevelMenu;
     public GameObject panel_tutor;
     public GameObject panel_Settings;
+    public GameObject panel_Quit;
     [Header ("Scroll")]
     public GameObject level_ScrollView;
     [Header ("Holder")]

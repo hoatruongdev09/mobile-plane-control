@@ -8,21 +8,18 @@ public class Indicator : MonoBehaviour {
     private SpriteRenderer spriteRenderer;
     public float flashTime = 0.3f;
 
-    public float counting = .3f;
-
     private void Start () {
-        Destroy (gameObject, 2f);
         spriteRenderer = GetComponent<SpriteRenderer> ();
-        counting = flashTime;
+        AnimateFlashing ();
+        StartCoroutine (DelayToDestroy (flashTime));
     }
-
-    private void Update () {
-        if (counting <= 0) {
-            spriteRenderer.enabled = !spriteRenderer.enabled;
-            planeShape.enabled = !planeShape.enabled;
-            counting = flashTime;
-        } else {
-            counting -= Time.deltaTime;
-        }
+    private void AnimateFlashing () {
+        LeanTween.value (gameObject, 1, .7f, 1).setOnUpdate ((float value) => {
+            spriteRenderer.color = new Color (spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, value);
+        }).setLoopPingPong ().setIgnoreTimeScale (true);
+    }
+    private IEnumerator DelayToDestroy (float time) {
+        yield return new WaitForSecondsRealtime (time);
+        Destroy (gameObject);
     }
 }

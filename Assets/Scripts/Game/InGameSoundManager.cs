@@ -37,9 +37,13 @@ public class InGameSoundManager : MonoBehaviour {
         audioSource = GetComponent<AudioSource> ();
         playSound = PlayerPrefs.GetInt ("sound", 1) == 1 ? true : false;
         playMusic = PlayerPrefs.GetInt ("music", 1) == 1 ? true : false;
+        PlayMusic (ac_Musics[0]);
     }
-    private void Update () {
-
+    public void PlayMusic (AudioClip clip) {
+        if (!playMusic) { return; }
+        audioSource.clip = clip;
+        audioSource.Play ();
+        audioSource.loop = true;
     }
     public void PlayASound (AudioClip clip) {
         if (playSound)

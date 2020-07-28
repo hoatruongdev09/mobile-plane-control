@@ -24,20 +24,20 @@ public class GamePanelView : UiView {
         textHighScore.text = $"Best score: {number}";
     }
     private void ButtonPauseClick () {
-        Debug.Log ($"pause: {Delegate == null}");
+        // Debug.Log ($"pause: {Delegate == null}");
         Delegate?.OnPauseClick ();
     }
     private void ButtonFastForwardClick () {
-        Debug.Log ("fast forward");
+        // Debug.Log ("fast forward");
         Delegate?.OnFastForward ();
         UpdateTextSpeedIndicate ();
     }
     public void UpdateTextSpeedIndicate () {
-        LeanTween.value (gameObject, 0, 1, 2f).setOnUpdate ((float value) => {
-            textSpeedIndicate.text = $"x{Mathf.Floor(Time.timeScale)}";
+        LeanTween.value (gameObject, 0, 1, 1f).setOnUpdate ((float value) => {
+            textSpeedIndicate.text = $"speed: x{string.Format ("{0:0.##}", Time.timeScale)}";
         }).setIgnoreTimeScale (true).setOnComplete (() => {
             if (Time.timeScale == 1) {
-                textSpeedIndicate.text = $"normal";
+                textSpeedIndicate.text = $"speed: normal";
             }
         });
     }

@@ -39,7 +39,7 @@ public class ObjectDetect : MonoBehaviour {
                     sameTagWithPlaneAirport = GetSameTagPlaneAirport (activeLine);
                     if (sameTagWithPlaneAirport != null) {
                         sameTagWithPlaneAirport.isHighlight = true;
-                        InGameSoundManager.Instance.PlayASound (InGameSoundManager.Instance.ac_planeSelectSound);
+                        InGameSoundManager.Instance?.PlayASound (InGameSoundManager.Instance.ac_planeSelectSound);
                     }
                 }
             }
@@ -98,7 +98,7 @@ public class ObjectDetect : MonoBehaviour {
                     sameTagWithPlaneAirport = GetSameTagPlaneAirport (activeLine);
                     if (sameTagWithPlaneAirport != null) {
                         sameTagWithPlaneAirport.isHighlight = true;
-                        InGameSoundManager.Instance.PlayASound (InGameSoundManager.Instance.ac_planeSelectSound);
+                        InGameSoundManager.Instance?.PlayASound (InGameSoundManager.Instance.ac_planeSelectSound);
                     }
                 }
             }
@@ -149,7 +149,7 @@ public class ObjectDetect : MonoBehaviour {
     }
     public void DeHighLight () {
         if (sameTagWithPlaneAirport != null) {
-            InGameSoundManager.Instance.PlayASound (InGameSoundManager.Instance.ac_planeDeselectSound);
+            InGameSoundManager.Instance?.PlayASound (InGameSoundManager.Instance.ac_planeDeselectSound);
             sameTagWithPlaneAirport.isHighlight = false;
             sameTagWithPlaneAirport = null;
         }

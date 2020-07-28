@@ -3,20 +3,59 @@ using UnityEngine;
 
 public class Airport : MonoBehaviour {
     public IAirportDelegate Delegate { get; set; }
-    public string planeTag;
+    public string PlaneTag {
+        get { return planeTag; }
+        set { planeTag = value; }
+    }
+    public Color ColorTag {
+        get { return colorTag; }
+        private set { colorTag = value; }
+    }
+    public virtual PlaneControl.PlaneType AcceptedPlaneType {
+        get {
+            return PlaneControl.PlaneType.air_plane;
+        }
+    }
+
+    [SerializeField] protected string planeTag;
+    [SerializeField] protected Color colorTag;
     public SpriteRenderer highlight;
     public int maxPointRecord = 5;
     public float angleToLand = 360;
-    [SerializeField] private List<Vector3> points;
-    private Vector2 airportSize;
+    [SerializeField] protected List<Vector3> points;
+    protected Vector2 airportSize;
     private float thresholdToLand = 4;
-
-    private void Start () {
+    private bool isHighlight = false;
+    protected void Start () {
         Collider2D collider = GetComponent<Collider2D> ();
         airportSize = collider.bounds.size;
     }
+    public void SetColorHighlight (Color color) {
+        highlight.color = color;
+        ColorTag = color;
+    }
+    public void Highlight () {
+        if (isHighlight) { return; }
+        isHighlight = true;
+        LeanTween.cancel (highlight.gameObject);
+        Color hightLightColor = highlight.color;
+        LeanTween.value (highlight.gameObject, 0.6f, 1, .5f).setOnUpdate ((float value) => {
+            hightLightColor.a = value;
+            highlight.color = hightLightColor;
+        }).setLoopPingPong ().setIgnoreTimeScale (true);
+    }
+    public void Dehighlight () {
+        if (!isHighlight) { return; }
+        isHighlight = false;
+        LeanTween.cancel (highlight.gameObject);
+        Color hightLightColor = highlight.color;
+        LeanTween.value (highlight.gameObject, hightLightColor.a, .6f, .5f).setOnUpdate ((float value) => {
+            hightLightColor.a = value;
+            highlight.color = hightLightColor;
+        }).setIgnoreTimeScale (true);
+    }
     public void Record (Vector3 point, NewScript.Path path) {
-        if (path.Controller.PlaneTag != planeTag) { return; }
+        if (path.Controller.PlaneTag != PlaneTag) { return; }
         if (points == null || points.Count == 0) {
             points = new List<Vector3> ();
             points.Add (point);
@@ -35,23 +74,23 @@ public class Airport : MonoBehaviour {
         //     // Debug.Log ("remove plane to landing");
         // }
     }
-    public List<Vector3> GetLandindPoint () {
-        Vector3 point1 = transform.position;
-        Vector3 point2 = transform.position + transform.up * (airportSize.y / 2);
+    public virtual List<Vector3> GetLandingPoint () {
+        Vector3 point1 = transform.TransformPoint (new Vector3 (0, 1));
+        Vector3 point2 = transform.TransformPoint (new Vector3 (0, 1.5f));
         List<Vector3> points = new List<Vector3> ();
         points.Add (point1);
         points.Add (point2);
         return points;
     }
-    private bool CheckDirectToLand (Vector3[] points) {
+    protected bool CheckDirectToLand (Vector3[] points) {
         if (!CheckFirstPoint (points[0])) {
-            // Debug.Log ("not the first point");
+            Debug.Log ("not the first point");
             return false;
         }
         var acceptPointCount = FindAcceptLandPoint (points).Count;
         return acceptPointCount >= 2;
     }
-    private List<Vector3> FindAcceptLandPoint (Vector3[] points) {
+    protected List<Vector3> FindAcceptLandPoint (Vector3[] points) {
         List<Vector3> acceptedPoints = new List<Vector3> ();
         float tempAngle = 0;
         for (int i = 1; i < points.Length; i++) {
@@ -68,19 +107,24 @@ public class Airport : MonoBehaviour {
         return acceptedPoints;
     }
 
-    internal void ClearPoints () {
+    public void ClearPoints () {
         points.Clear ();
     }
 
-    private bool CheckFirstPoint (Vector3 point) {
+    protected virtual bool CheckFirstPoint (Vector3 point) {
         Vector3 localPosition = transform.InverseTransformPoint (point);
-        // Debug.Log ($"{localPosition.y}  {-(airportSize.y)/10}");
-        if (localPosition.y > -(airportSize.y) / 10) {
+        if (localPosition.sqrMagnitude > airportSize.sqrMagnitude) {
             return false;
         }
+        // Debug.Log ($"{localPosition.y}   {airportSize.y / 10}");
+        // if (Mathf.Abs (localPosition.y) > airportSize.y / 10 && localPosition.y < 0) {
+        //     return false;
+        // }
         return true;
     }
-
+    private void OnDrawGizmos () {
+        Gizmos.DrawRay (transform.position, transform.up);
+    }
 }
 public interface IAirportDelegate {
     void OnAddLandingPlane ();

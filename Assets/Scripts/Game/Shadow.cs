@@ -18,6 +18,7 @@ public class Shadow : MonoBehaviour {
 
     private void Start () {
         shadow = new GameObject (name + ".Shadow");
+        shadow.transform.SetParent (transform.parent);
         spriteRD = GetComponent<SpriteRenderer> ();
         sd = shadow.AddComponent<SpriteRenderer> ();
 
