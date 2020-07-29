@@ -5192,6 +5192,8 @@ MonoBehaviour:
     type: 3}
   tornadoPrefab: {fileID: 8544115871283362899, guid: 395939db588d0444894be9ab0d301256,
     type: 3}
+  fireForestPrefab: {fileID: 114939000307005050, guid: 5c4beb5003da541c79f836cac82ea842,
+    type: 3}
   helipadPrefab: {fileID: 8516497919974375395, guid: 330a3d3d0c45646a3938a2eb4d10ea92,
     type: 3}
   airportPrefab: {fileID: 5502435411949871509, guid: d884cbc4e982345eca70cf052ac763d8,

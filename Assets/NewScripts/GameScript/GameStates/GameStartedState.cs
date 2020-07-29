@@ -222,10 +222,18 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         timer.currentFireSpawnTiming += Time.deltaTime;
         if (timer.currentFireSpawnTiming >= difficultData.createFireInterval) {
             Debug.Log ("Create fire");
+            var fire = spawnController.CreateFireForest (110, MapManager.Instance.GetRandomPosition ());
+            fire.onFireCooledDown += OnFireCoolDowned;
             counter.CurrentFireCount++;
             timer.currentFireSpawnTiming = 0;
         }
     }
+
+    private void OnFireCoolDowned (FireForest fire) {
+        counter.CurrentFireCount--;
+        fire.DestorySelf ();
+    }
+
     protected void SpawnCloud () {
         if (!hasCloud) { return; }
         if (counter.CurrentCloudCount > difficultData.maxCloudInTime) { return; }

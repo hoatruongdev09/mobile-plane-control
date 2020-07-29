@@ -17,6 +17,7 @@ public class SpawnController : MonoBehaviour {
     public GameObject warningSign;
     public FuelAnnouncer fuelPrefab;
     public Tornado tornadoPrefab;
+    public FireForest fireForestPrefab;
     public Airport helipadPrefab;
     public Airport airportPrefab;
     public Indicator indicatorPrefab;
@@ -24,6 +25,7 @@ public class SpawnController : MonoBehaviour {
     private GameObject indicateHolder;
     private GameObject airportHolder;
     private GameObject tornadoHolder;
+    private GameObject forestFireHolder;
     private GameObject fuelHolder;
     private List<PlaneControl> planes;
     private List<GameObject> enemies;
@@ -32,12 +34,17 @@ public class SpawnController : MonoBehaviour {
         indicateHolder = new GameObject ("IndicateHolder");
         airportHolder = new GameObject ("AirportHolder");
         tornadoHolder = new GameObject ("TornadoHolder");
+        forestFireHolder = new GameObject ("ForestFireHolder");
         fuelHolder = new GameObject ("FuelHolder");
         if (Instance == null) {
             Instance = this;
         }
     }
-
+    public FireForest CreateFireForest (float maxHp, Vector3 position) {
+        var fire = Instantiate (fireForestPrefab, position, Quaternion.identity, forestFireHolder.transform);
+        fire.MaxHP = maxHp;
+        return fire;
+    }
     public FuelAnnouncer CreateFuelAnnouncer () {
         return Instantiate (fuelPrefab, fuelHolder.transform);
     }
