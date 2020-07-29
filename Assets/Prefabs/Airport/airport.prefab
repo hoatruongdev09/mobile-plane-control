@@ -285,6 +285,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   planeTag: yellow
+  colorTag: {r: 0, g: 0, b: 0, a: 0}
   highlight: {fileID: 5501722219505792907}
   maxPointRecord: 4
   angleToLand: 10

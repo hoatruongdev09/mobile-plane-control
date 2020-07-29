@@ -4,7 +4,6 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
     public static GameController Instance { get; private set; }
     public OnPlaneCollided onPlaneCollided { get; set; }
-    public OnPlaneLanded onPlaneLanded { get; set; }
     public int MaxTimeSpeed { get { return maxTimeSpeed; } }
     public bool IsPause { get; set; }
 
@@ -38,13 +37,5 @@ public class GameController : MonoBehaviour {
 
     private void Update () {
         stateMachine.CurrentState.Update ();
-    }
-    public void OnPlaneLanding (PlaneControl plane) {
-        plane.Delete ();
-        scoreManager.AddLandedPlane (1);
-
-    }
-    public void OnPlaneCollide (PlaneControl plane) {
-        onPlaneCollided?.Invoke (plane);
     }
 }

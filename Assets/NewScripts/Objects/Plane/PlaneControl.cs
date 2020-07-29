@@ -4,9 +4,13 @@ using NewScript;
 using UnityEngine;
 
 public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCheckerDelegate {
+    public OnLanded onPlaneLanded { get; set; }
+    public OnCollidedWithPlane onCollidedWithPlane { get; set; }
     public IPlaneBehavior PlaneBehaviorDelegate { get; set; }
     public ITriggerCheckerDelegate TriggerCheckerDelegate { get; set; }
     public ICollisionCheckerDelegate CollisionCheckerDelegate { get; set; }
+    public delegate void OnLanded (PlaneControl plane);
+    public delegate void OnCollidedWithPlane (PlaneControl plane);
     public bool IsSelected {
         get { return isSelect; }
         set {
@@ -28,6 +32,11 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
         get { return isEnterMap; }
         set { isEnterMap = value; }
     }
+    public bool IsStun { get; set; }
+    public List<IPlaneComponent> Components {
+        get { return components; }
+        set { components = value; }
+    }
     public NewScript.Path Path { get { return path; } }
     public enum PlaneType { helicopter, air_plane }
 
@@ -45,21 +54,24 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     public Collider2D detector;
     public ColliderChecker detectorChecker;
     public ColliderChecker bodyCollider;
-    [SerializeField] private NewScript.Path path;
+    public NewScript.Path path;
+    private List<IPlaneComponent> components;
     private PlaneStateManager stateManager;
     private StateMachine stateMachine;
     private bool isReadyToLand = false;
     private bool isSelect = false;
     private bool isEnterMap = true;
     private void Start () {
-        path.Controller = this;
+        Init ();
         stateMachine = new StateMachine ();
         stateManager = new PlaneStateManager (this, stateMachine);
         stateMachine.Start (stateManager.StateFreeFly);
-        Init ();
 
     }
     private void Init () {
+        components = new List<IPlaneComponent> ();
+
+        path.Controller = this;
 
         bodyCollider.CollisionCheckerDelegate = this;
         bodyCollider.TriggerCheckerDelegate = this;
@@ -70,13 +82,19 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
         detectorChecker.OwnedInfo = this;
     }
     private void Update () {
-        stateMachine.CurrentState.Update ();
+        stateMachine.CurrentState?.Update ();
     }
     public void SetColor (Color color) {
         baseColor = color;
         foreach (var graphic in graphics) {
             graphic.color = color;
         }
+    }
+    public void OnOutOfFuel () {
+        if (stateMachine.CurrentState == stateManager.StateLanding) {
+            return;
+        }
+        stateMachine.ChangeState (stateManager.StateCrashing);
     }
     private void OnReadyToLand () {
         foreach (var graphic in graphics) {
@@ -130,7 +148,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
         isSelect = value;
         PlaneBehaviorDelegate?.OnSelect (isSelect);
         if (!IsReadyToLand) {
-            path.ActiveEndPoint (isSelect);
+            path.DeactivateEndPoint (isSelect);
         }
         if (isSelect) {
             IsReadyToLand = false;
@@ -147,12 +165,24 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
         if (checker == detectorChecker) {
             ActiveWarningIndicator (true);
         }
+        if (checker == bodyCollider) {
+            if (other.tag == "hurricane") {
+                var reflectDirect = transform.position - other.transform.position;
+                stateMachine.ChangeState (stateManager.StateFreeFly, new { effect = true, stun = true, direct = reflectDirect });
+            }
+        }
         TriggerCheckerDelegate?.OnCheckerTriggerEnter2D (checker, other);
     }
 
     public void OnCheckerTriggerStay2D (ColliderChecker checker, Collider2D other) {
         if (checker == detectorChecker) {
             warningIndicate.transform.Rotate (0, 0, 360 * Time.unscaledDeltaTime);
+        }
+        if (checker == bodyCollider) {
+            if (other.tag == "hurricane") {
+                var reflectDirect = transform.position - other.transform.position;
+                stateMachine.ChangeState (stateManager.StateFreeFly, new { effect = true, stun = true, direct = reflectDirect });
+            }
         }
         TriggerCheckerDelegate?.OnCheckerTriggerStay2D (checker, other);
     }
@@ -169,7 +199,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
         if (checker == bodyCollider) {
             ColliderChecker otherChecker = other.gameObject.GetComponent<ColliderChecker> ();
             if (otherChecker && otherChecker.OwnedInfo.GetType () == typeof (PlaneControl)) {
-                GameController.Instance?.OnPlaneCollide (this);
+                onCollidedWithPlane?.Invoke (this);
             }
         }
         CollisionCheckerDelegate?.OnCheckerCollisionEnter2D (checker, other);
@@ -182,6 +212,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     public void OnCheckerCollisionStay2D (ColliderChecker checker, Collision2D other) {
         CollisionCheckerDelegate?.OnCheckerCollisionStay2D (checker, other);
     }
+
 }
 public interface IPlaneBehavior {
     void OnSelect (bool action);

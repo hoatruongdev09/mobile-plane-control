@@ -4,6 +4,7 @@ public class PlaneStateManager {
     public FolllowPath StateFollowPath { get; private set; }
     public Landing StateLanding { get; private set; }
     public FreeFly StateFreeFly { get; private set; }
+    public Crashing StateCrashing { get; private set; }
     public PlaneStateManager (PlaneControl controller, StateMachine stateMachine) {
         Controller = controller;
         Machine = stateMachine;
@@ -14,5 +15,6 @@ public class PlaneStateManager {
         StateFollowPath = new FolllowPath (this);
         StateFreeFly = new FreeFly (this);
         StateLanding = new Landing (this);
+        StateCrashing = new Crashing (this);
     }
 }

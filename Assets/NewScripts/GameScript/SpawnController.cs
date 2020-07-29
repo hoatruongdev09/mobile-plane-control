@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 public class SpawnController : MonoBehaviour {
+    public static SpawnController Instance { get; private set; }
     public List<PlaneControl> ListPlanes {
         get { return planes; }
         set { planes = value; }
@@ -12,19 +13,43 @@ public class SpawnController : MonoBehaviour {
         get { return enemies; }
         set { enemies = value; }
     }
-    public int MaxPlaneInTime { get; set; }
+
+    public GameObject warningSign;
+    public FuelAnnouncer fuelPrefab;
+    public Tornado tornadoPrefab;
     public Airport helipadPrefab;
     public Airport airportPrefab;
     public Indicator indicatorPrefab;
     private GameObject planesHolder;
     private GameObject indicateHolder;
     private GameObject airportHolder;
+    private GameObject tornadoHolder;
+    private GameObject fuelHolder;
     private List<PlaneControl> planes;
     private List<GameObject> enemies;
     private void Awake () {
         planesHolder = new GameObject ("PlanesHolder");
         indicateHolder = new GameObject ("IndicateHolder");
         airportHolder = new GameObject ("AirportHolder");
+        tornadoHolder = new GameObject ("TornadoHolder");
+        fuelHolder = new GameObject ("FuelHolder");
+        if (Instance == null) {
+            Instance = this;
+        }
+    }
+
+    public FuelAnnouncer CreateFuelAnnouncer () {
+        return Instantiate (fuelPrefab, fuelHolder.transform);
+    }
+    public GameObject CreateWarningSign (Vector3 position, float lifeTime) {
+        var sign = Instantiate (warningSign, position, Quaternion.identity);
+        Destroy (sign, lifeTime);
+        return sign;
+    }
+    public Tornado CreateTornado (float lifeTime, Vector3 position) {
+        var tornado = Instantiate (tornadoPrefab, position, Quaternion.identity, tornadoHolder.transform);
+        tornado.LifeTime = lifeTime;
+        return tornado;
     }
     public Airport CreateAirport () {
         var airport = Instantiate (airportPrefab, airportHolder.transform);
@@ -43,6 +68,7 @@ public class SpawnController : MonoBehaviour {
         return plane;
     }
     public PlaneControl CreateAPlaneForAirport (Airport airport, bool hasWater, bool hasFuel, float fuelMin, float fuelMax) {
+        Debug.Log ($"create plane with fuel: {hasFuel}");
         var spawnPosition = MapManager.Instance.RandomSpawnPos ();
         var destinatePosition = MapManager.Instance.GetRandomPosition ();
         var acceptedPlanes = planes.Where (planes => planes.planeType == airport.AcceptedPlaneType).ToArray ();
@@ -66,7 +92,13 @@ public class SpawnController : MonoBehaviour {
 
     }
     private void AddFuelComponent (PlaneControl plane, float minTime, float maxTime) {
-
+        var fuel = plane.gameObject.AddComponent<PlaneFuelComponent> ();
+        if (fuel == null) {
+            Debug.Log ("fuel is null");
+            return;
+        }
+        fuel.StartFuel = Random.Range (minTime, maxTime);
+        fuel.AttachToPlane (plane);
     }
     public float CalculationAngle (Vector2 direction) {
         return Mathf.Atan2 (direction.x, direction.y) * Mathf.Rad2Deg;

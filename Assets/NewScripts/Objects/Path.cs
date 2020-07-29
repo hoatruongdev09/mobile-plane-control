@@ -13,7 +13,7 @@ namespace NewScript {
 
         public PathEndpoint endPoint;
         public LineRenderer lineVisual;
-        public void ActiveEndPoint (bool action) {
+        public void DeactivateEndPoint (bool action) {
             endPoint.gameObject.SetActive (!action);
             endPoint.transform.parent = null;
             try {

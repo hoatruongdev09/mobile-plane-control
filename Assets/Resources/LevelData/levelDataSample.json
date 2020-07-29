@@ -4,7 +4,7 @@
   "enemies": true,
   "fire": true,
   "cloud": true,
-  "tornado": true,
+  "tornado": false,
   "fuel": true,
   "airport": [
     {

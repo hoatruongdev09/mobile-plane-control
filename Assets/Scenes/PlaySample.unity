@@ -274,7 +274,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &32742268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -869,7 +869,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -20, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 357.98563, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &282665074
 MonoBehaviour:
@@ -961,7 +961,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 150, y: 20}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 135.82735, y: 51.79856}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &287660962
 MonoBehaviour:
@@ -2580,39 +2580,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919887801}
   m_CullTransparentMesh: 0
---- !u!21 &931603645
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: UI/Procedural UI Image
-  m_Shader: {fileID: 4800000, guid: 27d83044d20c5de4e9d57d35e4fda368, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - _ColorMask: 15
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &938412950
 GameObject:
   m_ObjectHideFlags: 0
@@ -3738,7 +3705,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f1c5417c9d7ab4b84e531f83f60a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 931603645}
+  m_Material: {fileID: 1612045915}
   m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 0.5019608}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
@@ -5078,7 +5045,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f1c5417c9d7ab4b84e531f83f60a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 931603645}
+  m_Material: {fileID: 1612045915}
   m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 0.5019608}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
@@ -5143,6 +5110,39 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!21 &1612045915
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UI/Procedural UI Image
+  m_Shader: {fileID: 4800000, guid: 27d83044d20c5de4e9d57d35e4fda368, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _ColorMask: 15
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1629801183
 GameObject:
   m_ObjectHideFlags: 0
@@ -5186,6 +5186,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6edfc775c597446f5b4659fae487a046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  warningSign: {fileID: 1117566722230142, guid: 93c2cf8a102524b0d900b153d5f35c60,
+    type: 3}
+  fuelPrefab: {fileID: 7572742275551785790, guid: f30fe997290554c33aeecc9d743f7153,
+    type: 3}
+  tornadoPrefab: {fileID: 8544115871283362899, guid: 395939db588d0444894be9ab0d301256,
+    type: 3}
   helipadPrefab: {fileID: 8516497919974375395, guid: 330a3d3d0c45646a3938a2eb4d10ea92,
     type: 3}
   airportPrefab: {fileID: 5502435411949871509, guid: d884cbc4e982345eca70cf052ac763d8,
@@ -5810,7 +5816,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df43f6e8dee934191b20de7cc3a95093, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPointDraw: 100
   detectPlaneLayerMask:
     serializedVersion: 2
     m_Bits: 16384
@@ -6438,7 +6443,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 20, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 357.98563, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2107536435
 MonoBehaviour:

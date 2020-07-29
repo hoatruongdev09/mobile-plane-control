@@ -4,20 +4,37 @@ public class FreeFly : PlaneState, IPlaneBehavior, ITriggerCheckerDelegate, ICol
     private Transform transform;
     private PlaneControl controller;
     private float freeFlyAngle;
+    private Vector3 freeFlyDirect;
+    private bool enterWithEffect;
     public FreeFly (PlaneStateManager stateManager) : base (stateManager) {
         controller = stateManager.Controller;
         transform = stateManager.Controller.transform;
     }
-
+    public override void Enter (object options) {
+        enterWithEffect = (bool) options.GetType ().GetProperty ("effect").GetValue (options);
+        controller.IsStun = (bool) options.GetType ().GetProperty ("stun").GetValue (options);
+        freeFlyDirect = ((Vector3) options.GetType ().GetProperty ("direct").GetValue (options)).normalized;
+        // Debug.Log ($"freeFlyDirect: {freeFlyDirect}");
+        Enter ();
+    }
     public override void Enter () {
         controller.PlaneBehaviorDelegate = this;
         controller.TriggerCheckerDelegate = this;
         controller.CollisionCheckerDelegate = this;
-        controller.Path.ActiveEndPoint (true);
-        freeFlyAngle = transform.rotation.eulerAngles.z;
-        Debug.Log ($"init free fly angle: {freeFlyAngle}");
+        controller.Path.DeactivateEndPoint (true);
+        controller.Path.Clear ();
+        if (!enterWithEffect) {
+            freeFlyAngle = transform.rotation.eulerAngles.z;
+            freeFlyDirect = transform.up;
+            // Debug.Log ($"init free: {freeFlyAngle} | {freeFlyDirect}");
+        }
+        if (controller.IsStun) {
+            controller.IsReadyToLand = false;
+        }
     }
     public override void Exit () {
+        enterWithEffect = false;
+        controller.IsStun = false;
         controller.PlaneBehaviorDelegate = null;
         controller.TriggerCheckerDelegate = null;
         controller.CollisionCheckerDelegate = null;
@@ -36,16 +53,26 @@ public class FreeFly : PlaneState, IPlaneBehavior, ITriggerCheckerDelegate, ICol
         FlyForward ();
     }
     private void FlyForward () {
-        transform.Translate (Vector2.up * StateManager.Controller.MoveSpeed * Time.smoothDeltaTime);
-        transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, freeFlyAngle), 2 * Time.smoothDeltaTime);
+        // transform.Translate (freeFlyDirect * StateManager.Controller.MoveSpeed * Time.smoothDeltaTime);
+        transform.position += freeFlyDirect * StateManager.Controller.MoveSpeed * Time.smoothDeltaTime;
+        if (controller.IsStun) {
+            transform.Rotate (0, 0, controller.DisableRotateSpeed * Time.smoothDeltaTime, Space.Self);
+        } else {
+            transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, freeFlyAngle), Time.smoothDeltaTime);
+        }
+    }
+    private void StunEffect () {
+        if (!controller.IsStun) { return; }
+        freeFlyAngle += 50 * Time.smoothDeltaTime;
     }
     private float CalculateFlyRotation (Vector2 direct) {
         return Mathf.Atan2 (direct.y, direct.x) * Mathf.Rad2Deg - 90;
     }
     private void ReflectDirection (Vector2 normal) {
-        Vector2 reflectVector = Vector2.Reflect (transform.up, normal);
+        Vector2 reflectVector = Vector2.Reflect (freeFlyDirect, normal);
         Debug.Log ($"calculate reflect: {transform.up} {normal} {reflectVector}");
         freeFlyAngle = CalculateFlyRotation (reflectVector);
+        freeFlyDirect = reflectVector.normalized;
     }
     public void OnCheckerTriggerEnter2D (ColliderChecker checker, Collider2D other) {
 

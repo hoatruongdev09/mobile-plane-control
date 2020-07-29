@@ -412,7 +412,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   planeType: 1
   baseColor: {r: 0.7529412, g: 0.22352941, b: 0.16862746, a: 1}
-  MoveSpeed: 2
+  MoveSpeed: 5
   TurnSpeed: 1
   MeetDistance: 0.1
   DisableRotateSpeed: 360

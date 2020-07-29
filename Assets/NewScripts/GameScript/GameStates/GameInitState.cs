@@ -38,7 +38,7 @@ public class GameInitState : GameState {
                             hasFire = hasFire,
                             hasCloud = hasCloud,
                             hasTornado = hasTornado,
-                            hasFuel = hasTornado,
+                            hasFuel = hasFuel,
                     },
                     difficult = levelDifficultData
             });

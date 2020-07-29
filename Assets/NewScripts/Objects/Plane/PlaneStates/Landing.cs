@@ -40,7 +40,7 @@ public class Landing : FolllowPath {
                 graphic.color = new Color (graphic.color.r, graphic.color.g, graphic.color.b, value);
             }
         }).setOnComplete (() => {
-            GameController.Instance.OnPlaneLanding (controller);
+            this.controller.onPlaneLanded?.Invoke (this.controller);
         });
     }
     private void AnimateLanding () {
