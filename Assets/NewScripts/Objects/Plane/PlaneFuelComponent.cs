@@ -34,4 +34,7 @@ public class PlaneFuelComponent : MonoBehaviour, IPlaneComponent {
             fuelAnnouncer.Show (string.Format ("{0:0}", remainFuel), (remainFuel < 10) ? warningColor : normalColor);
         }
     }
+    private void OnDestroy () {
+        Destroy (fuelAnnouncer.gameObject);
+    }
 }

@@ -8,6 +8,9 @@ public class FireForest : MonoBehaviour {
     public float HP = 10;
     private bool destroyed = false;
     public delegate void OnFireCooledDown (FireForest fire);
+    private void Start () {
+        HP = MaxHP / 2;
+    }
     private void Update () {
         if (destroyed) { return; }
         HP += 0.5f * Time.deltaTime;

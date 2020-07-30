@@ -61,6 +61,8 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     private bool isReadyToLand = false;
     private bool isSelect = false;
     private bool isEnterMap = true;
+    private float baseSpeed;
+    private float baseTurnSpeed;
     private void Start () {
         Init ();
         stateMachine = new StateMachine ();
@@ -80,6 +82,9 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
         detectorChecker.CollisionCheckerDelegate = this;
         detectorChecker.TriggerCheckerDelegate = this;
         detectorChecker.OwnedInfo = this;
+
+        baseSpeed = MoveSpeed;
+        baseTurnSpeed = TurnSpeed;
     }
     private void Update () {
         stateMachine.CurrentState?.Update ();
@@ -162,7 +167,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
         });
     }
     public void OnCheckerTriggerEnter2D (ColliderChecker checker, Collider2D other) {
-        if (checker == detectorChecker) {
+        if (checker == detectorChecker && other.tag != "forestfire") {
             ActiveWarningIndicator (true);
         }
         if (checker == bodyCollider) {
@@ -183,13 +188,25 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
                 var reflectDirect = transform.position - other.transform.position;
                 stateMachine.ChangeState (stateManager.StateFreeFly, new { effect = true, stun = true, direct = reflectDirect });
             }
+
+            if (other.tag == "cloud") {
+                MoveSpeed = baseSpeed * .7f;
+                TurnSpeed = baseTurnSpeed * .7f;
+            }
         }
+
         TriggerCheckerDelegate?.OnCheckerTriggerStay2D (checker, other);
     }
 
     public void OnCheckerTriggerExit2D (ColliderChecker checker, Collider2D other) {
         if (checker == detectorChecker) {
             ActiveWarningIndicator (false);
+        }
+        if (checker == bodyCollider) {
+            if (other.tag == "cloud") {
+                MoveSpeed = baseSpeed;
+                TurnSpeed = baseTurnSpeed;
+            }
         }
         TriggerCheckerDelegate?.OnCheckerTriggerExit2D (checker, other);
     }

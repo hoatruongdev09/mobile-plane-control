@@ -240,10 +240,19 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         timer.currentCloudSpawnTiming += Time.deltaTime;
         if (timer.currentCloudSpawnTiming >= difficultData.cloudCreateInterval) {
             Debug.Log ("Create cloud");
+            var cloud = spawnController.CreateCloud (MapManager.Instance.GetRandomPosition ());
+            cloud.LifeTime = UnityEngine.Random.Range (15, 20);
+            cloud.onDisappear += OnCloudDisappear;
             counter.CurrentCloudCount++;
             timer.currentCloudSpawnTiming = 0;
         }
     }
+
+    private void OnCloudDisappear (Cloud cloud) {
+        cloud.DestroySelf ();
+        counter.CurrentCloudCount--;
+    }
+
     private bool GetChance (float input) {
         return UnityEngine.Random.Range (0, 101) <= input;
         // return true;

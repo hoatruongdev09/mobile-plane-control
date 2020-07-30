@@ -13,8 +13,10 @@ public class SpawnController : MonoBehaviour {
         get { return enemies; }
         set { enemies = value; }
     }
-
+    public Cloud[] cloudPrefabs;
+    public NewWaterDrop waterDropPrefab;
     public GameObject warningSign;
+    public ProcessBarGame processBarPrefab;
     public FuelAnnouncer fuelPrefab;
     public Tornado tornadoPrefab;
     public FireForest fireForestPrefab;
@@ -27,6 +29,7 @@ public class SpawnController : MonoBehaviour {
     private GameObject tornadoHolder;
     private GameObject forestFireHolder;
     private GameObject fuelHolder;
+    private GameObject cloudHolder;
     private List<PlaneControl> planes;
     private List<GameObject> enemies;
     private void Awake () {
@@ -36,9 +39,19 @@ public class SpawnController : MonoBehaviour {
         tornadoHolder = new GameObject ("TornadoHolder");
         forestFireHolder = new GameObject ("ForestFireHolder");
         fuelHolder = new GameObject ("FuelHolder");
+        cloudHolder = new GameObject ("Cloud Holder");
         if (Instance == null) {
             Instance = this;
         }
+    }
+    public Cloud CreateCloud (Vector3 position) {
+        return Instantiate (cloudPrefabs[Random.Range (0, cloudPrefabs.Length)], position, Quaternion.identity, cloudHolder.transform);
+    }
+    public NewWaterDrop CreateWaterDrop (Transform transform) {
+        return Instantiate (waterDropPrefab, transform);
+    }
+    public ProcessBarGame CreateProcessBar (Transform transform) {
+        return Instantiate (processBarPrefab, transform);
     }
     public FireForest CreateFireForest (float maxHp, Vector3 position) {
         var fire = Instantiate (fireForestPrefab, position, Quaternion.identity, forestFireHolder.transform);
@@ -85,7 +98,7 @@ public class SpawnController : MonoBehaviour {
         var plane = Instantiate (acceptedPlanes[Random.Range (0, acceptedPlanes.Length)], spawnPosition, Quaternion.Euler (0, 0, -CalculationAngle (destinatePosition - spawnPosition)));
         plane.transform.SetParent (planesHolder.transform);
         if (hasWater) {
-            AddWaterComponent (plane);
+            AddWaterComponent (plane, Random.Range (100, 120));
         }
         if (hasFuel) {
             AddFuelComponent (plane, fuelMin, fuelMax);
@@ -95,8 +108,14 @@ public class SpawnController : MonoBehaviour {
         SpawnIndicator (plane, spawnPosition, destinatePosition);
         return plane;
     }
-    private void AddWaterComponent (PlaneControl plane) {
-
+    private void AddWaterComponent (PlaneControl plane, float maxWater) {
+        var water = plane.gameObject.AddComponent<PlaneWaterComponent> ();
+        if (water == null) {
+            Debug.Log ("water is null");
+            return;
+        }
+        water.MaxWater = maxWater;
+        water.AttachToPlane (plane);
     }
     private void AddFuelComponent (PlaneControl plane, float minTime, float maxTime) {
         var fuel = plane.gameObject.AddComponent<PlaneFuelComponent> ();

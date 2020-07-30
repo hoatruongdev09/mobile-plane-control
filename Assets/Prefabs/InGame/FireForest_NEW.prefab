@@ -9407,8 +9407,8 @@ GameObject:
   - component: {fileID: 4002579155937164}
   - component: {fileID: 61514169532208212}
   - component: {fileID: 114939000307005050}
-  m_Layer: 0
-  m_Name: ForestFire 1
+  m_Layer: 15
+  m_Name: FireForest_NEW
   m_TagString: forestfire
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

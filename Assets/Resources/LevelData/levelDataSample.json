@@ -2,10 +2,10 @@
   "background": "levels_island copy 6",
   "levelBackground": "levels_island copy 7",
   "enemies": true,
-  "fire": true,
-  "cloud": true,
+  "fire": false,
+  "cloud": false,
   "tornado": false,
-  "fuel": true,
+  "fuel": false,
   "airport": [
     {
       "name": "airport-yellow",

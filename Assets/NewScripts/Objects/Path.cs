@@ -76,6 +76,13 @@ namespace NewScript {
             }
             lineVisual.SetPosition (index, position);
         }
+        private void OnDisable () {
+            try {
+                Destroy (endPoint.gameObject);
+            } catch (Exception e) {
+
+            }
+        }
 
     }
 

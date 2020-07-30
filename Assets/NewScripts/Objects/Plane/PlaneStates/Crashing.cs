@@ -2,18 +2,23 @@
 using UnityEngine;
 
 public class Crashing : PlaneState {
-    private PlaneControl plane;
+    private PlaneControl controller;
     private Transform transform;
     private bool crashed;
     private float randomRotation;
+
+    private float countingRandom = 0;
+    private float crashingSpeed = 0;
     public Crashing (PlaneStateManager stateManager) : base (stateManager) {
-        plane = stateManager.Controller;
-        transform = plane.transform;
+        controller = stateManager.Controller;
+        transform = controller.transform;
     }
     public override void Enter () {
-        plane.detector.enabled = false;
-        plane.bodyCollider.gameObject.SetActive (false);
-        randomRotation = UnityEngine.Random.Range (-15, 15) + transform.rotation.eulerAngles.z;
+        controller.detector.enabled = false;
+        controller.bodyCollider.gameObject.SetActive (false);
+        controller.path.DeactivateEndPoint (true);
+        controller.Path.Clear ();
+        randomRotation = UnityEngine.Random.Range (-60, 60) + transform.rotation.eulerAngles.z;
         StartCrashing ();
     }
     public override void Update () {
@@ -21,17 +26,24 @@ public class Crashing : PlaneState {
     }
     private void CrashFlying () {
         if (crashed) { return; }
-        transform.Translate (Vector2.up * plane.MoveSpeed * Time.smoothDeltaTime);
-        transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, randomRotation), 2 * Time.smoothDeltaTime);
-        // transform.Rotate (0, 0, plane.DisableRotateSpeed * Time.smoothDeltaTime);
+        if (countingRandom >= 1f) {
+            randomRotation = UnityEngine.Random.Range (-60, 60) + transform.rotation.eulerAngles.z;
+            countingRandom = 0;
+        } else {
+            countingRandom += Time.deltaTime;
+        }
+        transform.Translate (Vector2.up * (controller.MoveSpeed + crashingSpeed) * Time.smoothDeltaTime);
+        transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, randomRotation), 10 * Time.smoothDeltaTime);
     }
     private void StartCrashing () {
         AnimateCrashing ().setOnComplete (() => {
             crashed = true;
-            plane.onCollidedWithPlane?.Invoke (plane);
-        }).setEaseInBack ();
+            controller.onCollidedWithPlane?.Invoke (controller);
+        }).setEaseInBack ().setOnUpdate ((Vector3 value) => {
+            crashingSpeed += Time.deltaTime;
+        });
     }
     private LTDescr AnimateCrashing () {
-        return transform.LeanScale (Vector3.one * 0.3f, 2f);
+        return transform.LeanScale (Vector3.one * 0.3f, 3f);
     }
 }
