@@ -16,7 +16,11 @@ public class GamePauseState : GameState, IPausePanelDelegate {
         AnimatePause ();
     }
 
-    public void OnBackToMenu () { }
+    public void OnBackToMenu () {
+        uiManager.ShowFader (() => {
+            GameController.Instance?.BackToMenu ();
+        });
+    }
 
     public void OnContinues () {
         uiManager.ClosePanel (uiManager.viewPausePanel, () => { });
@@ -27,7 +31,11 @@ public class GamePauseState : GameState, IPausePanelDelegate {
     public void OnPauseClick () {
 
     }
-    public void OnRestart () { }
+    public void OnRestart () {
+        uiManager.ShowFader (() => {
+            GameController.Instance?.RestartGame ();
+        });
+    }
 
     public void OnSoundInteract () { }
 

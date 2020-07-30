@@ -1,7 +1,12 @@
 {
+  "info": {
+    "id": "sampleLevelData",
+    "levelImage": "levels_island copy 6",
+    "difficult": 2
+  },
   "background": "levels_island copy 6",
   "levelBackground": "levels_island copy 7",
-  "enemies": true,
+  "enemies": false,
   "fire": false,
   "cloud": false,
   "tornado": false,

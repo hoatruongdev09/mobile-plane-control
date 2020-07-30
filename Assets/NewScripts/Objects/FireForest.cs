@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FireForest : MonoBehaviour {
-    public OnFireCooledDown onFireCooledDown;
+    public OnFireCooledDown onFireExtinguished;
     public float MaxHP = 110;
     public float HP = 10;
     private bool destroyed = false;
@@ -22,7 +22,7 @@ public class FireForest : MonoBehaviour {
         HP -= cool;
         if (HP <= 0) {
             destroyed = true;
-            onFireCooledDown?.Invoke (this);
+            onFireExtinguished?.Invoke (this);
         }
     }
     public void DestorySelf () {

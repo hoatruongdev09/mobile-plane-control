@@ -23,7 +23,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     private LevelDifficultData difficultData;
     protected FlagCounter counter;
     protected FlagTimer timer;
-
+    private LevelDataInfo levelInfo;
     public GameStartedState (GameStateManager stateManager) : base (stateManager) {
         gameControl = stateManager.GameController;
         pathDrawer = gameControl.pathDrawer;
@@ -36,6 +36,11 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         counter = new FlagCounter ();
     }
     public override void Enter (object options) {
+        try {
+            levelInfo = (LevelDataInfo) options.GetType ().GetProperty ("info").GetValue (options);
+        } catch (Exception e) {
+            Debug.LogError (e);
+        }
         try {
             var flags = options.GetType ().GetProperty ("flags").GetValue (options);
             hasFire = (bool) flags?.GetType ().GetProperty ("hasFire").GetValue (flags);
@@ -57,6 +62,12 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     }
     public override void Enter () {
         gameControl.uiManager.viewGamePanel.Delegate = this;
+
+        scoreManager.onBestScoreChanges += gameControl.uiManager.viewGamePanel.SetHighScore;
+        scoreManager.onCurrentPlanesChanges += gameControl.uiManager.viewGamePanel.SetCurrentTextLanded;
+        scoreManager.onBestFireExtinguishedChange += gameControl.uiManager.viewGamePanel.SetCurrentFireExtinguished;
+        scoreManager.onCurrentFireExtinguishedChanges += gameControl.uiManager.viewGamePanel.SetBestFireExtinguished;
+
         StartAnimate ();
     }
     public override void Update () {
@@ -68,6 +79,12 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     }
     public override void Exit () {
         gameControl.uiManager.Delegate = null;
+
+        scoreManager.onBestScoreChanges -= gameControl.uiManager.viewGamePanel.SetHighScore;
+        scoreManager.onCurrentPlanesChanges -= gameControl.uiManager.viewGamePanel.SetCurrentTextLanded;
+        scoreManager.onBestFireExtinguishedChange -= gameControl.uiManager.viewGamePanel.SetCurrentFireExtinguished;
+        scoreManager.onCurrentFireExtinguishedChanges -= gameControl.uiManager.viewGamePanel.SetBestFireExtinguished;
+
     }
     protected virtual void StartAnimate () {
         var lastTimeSpeed = Time.timeScale;
@@ -78,7 +95,10 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     protected virtual void OnPlaneCollided (PlaneControl plane) {
         AddCollidedPlane (plane);
         gameControl.StartCoroutine (DelayToEndGame (0.1f, () => {
-            stateManager.StateMachine.ChangeState (stateManager.OverState, new { collidedPlanes = this.collidedPlanes });
+            stateManager.StateMachine.ChangeState (stateManager.OverState, new {
+                collidedPlanes = this.collidedPlanes,
+                    info = this.levelInfo
+            });
         }));
 
     }
@@ -223,14 +243,15 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         if (timer.currentFireSpawnTiming >= difficultData.createFireInterval) {
             Debug.Log ("Create fire");
             var fire = spawnController.CreateFireForest (110, MapManager.Instance.GetRandomPosition ());
-            fire.onFireCooledDown += OnFireCoolDowned;
+            fire.onFireExtinguished += OnFireExtinguished;
             counter.CurrentFireCount++;
             timer.currentFireSpawnTiming = 0;
         }
     }
 
-    private void OnFireCoolDowned (FireForest fire) {
+    private void OnFireExtinguished (FireForest fire) {
         counter.CurrentFireCount--;
+        scoreManager.AddFireExtinguished (1);
         fire.DestorySelf ();
     }
 

@@ -5,11 +5,14 @@ using UnityEngine.UI;
 public class GamePanelView : UiView {
     public IGamePanelViewDelegate Delegate { get; set; }
 
+    [SerializeField] public Text textCurrentFireExtinguished;
+    [SerializeField] public Text textBestFireExtinguished;
     [SerializeField] public Text textCurrentLandedPlane;
     [SerializeField] public Text textHighScore;
     [SerializeField] public Button buttonPause;
     [SerializeField] public Button buttonFastForward;
     [SerializeField] public Text textSpeedIndicate;
+    public RectTransform fireScoreHolder;
     private void OnEnable () {
         UpdateTextSpeedIndicate ();
     }
@@ -22,6 +25,12 @@ public class GamePanelView : UiView {
     }
     public void SetHighScore (int number) {
         textHighScore.text = $"Best score: {number}";
+    }
+    public void SetCurrentFireExtinguished (int number) {
+        textCurrentFireExtinguished.text = $"{number}";
+    }
+    public void SetBestFireExtinguished (int number) {
+        textBestFireExtinguished.text = $"{number}";
     }
     private void ButtonPauseClick () {
         // Debug.Log ($"pause: {Delegate == null}");
@@ -41,6 +50,10 @@ public class GamePanelView : UiView {
             }
         });
     }
+    public void ShowFireScoreHolder (bool action) {
+        fireScoreHolder.gameObject.SetActive (action);
+    }
+
 }
 public interface IGamePanelViewDelegate {
     void OnPauseClick ();

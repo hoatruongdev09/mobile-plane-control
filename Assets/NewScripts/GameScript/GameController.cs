@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour {
     public static GameController Instance { get; private set; }
     public OnPlaneCollided onPlaneCollided { get; set; }
@@ -29,13 +30,17 @@ public class GameController : MonoBehaviour {
         mainCamera = Camera.main;
         stateMachine = new StateMachine ();
         stateManager = new GameStateManager (this, stateMachine);
-
-        scoreManager.onCurrentPlanesChanges += uiManager.viewGamePanel.SetCurrentTextLanded;
-        scoreManager.onCurrentPlanesChanges += uiManager.viewGamePanel.SetHighScore;
         stateMachine.Start (stateManager.InitState, new { level = "levelDataSample", difficult = "levelDifficultSample" });
     }
 
     private void Update () {
         stateMachine.CurrentState.Update ();
+    }
+
+    public void RestartGame () {
+        SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+    }
+    public void BackToMenu () {
+
     }
 }

@@ -16,16 +16,23 @@ public class GameInitState : GameState {
     private bool hasTornado;
     private bool hasFuel;
     private LevelDifficultData levelDifficultData;
+    private LevelDataInfo levelInfo;
+    private ScoreController scoreController;
     public GameInitState (GameStateManager stateManager) : base (stateManager) {
         uiManager = stateManager.GameController.uiManager;
         controller = stateManager.GameController;
         spawnController = stateManager.GameController.spawnController;
         mapGraphicController = stateManager.GameController.mapGraphicController;
         airportManager = stateManager.GameController.airportManager;
+        scoreController = controller.scoreManager;
     }
     public override void Enter (object options) {
         string levelData = (string) options.GetType ().GetProperty ("level").GetValue (options);
         string difficult = (string) options.GetType ().GetProperty ("difficult").GetValue (options);
+
+        scoreController.onBestFireExtinguishedChange += uiManager.viewGamePanel.SetBestFireExtinguished;
+        scoreController.onBestScoreChanges += uiManager.viewGamePanel.SetHighScore;
+
         LoadLevelData (levelData);
         LoadDifficultData (difficult);
         Enter ();
@@ -40,11 +47,15 @@ public class GameInitState : GameState {
                             hasTornado = hasTornado,
                             hasFuel = hasFuel,
                     },
-                    difficult = levelDifficultData
+                    difficult = levelDifficultData,
+                    info = levelInfo
             });
         }));
     }
+
     public override void Exit () {
+        scoreController.onBestFireExtinguishedChange -= uiManager.viewGamePanel.SetBestFireExtinguished;
+        scoreController.onBestScoreChanges -= uiManager.viewGamePanel.SetHighScore;
         uiManager.HideFader ();
     }
     private void LoadDifficultData (string difficultData) {
@@ -63,7 +74,18 @@ public class GameInitState : GameState {
         LoadMapBackground (levelDataModel.background);
         LoadLevelBackground (levelDataModel.levelBackground);
         LoadGameFlags (levelDataModel);
+        levelInfo = levelDataModel.info;
+        LoadSavedScore (levelInfo.id);
         levelLoaded = true;
+    }
+    private void LoadSavedScore (string levelID) {
+        if (!PlayerPrefs.HasKey (levelID)) { return; }
+        string jsonData = PlayerPrefs.GetString (levelID);
+        var savedScore = JsonUtility.FromJson<LevelScoreInfo> (jsonData);
+
+        Debug.Log ($"saved data: {savedScore}");
+        scoreController.BestFireExtinguished = savedScore.bestFireExtinguished;
+        scoreController.BestScore = savedScore.bestLandedScore;
     }
     private void LoadGameFlags (LevelDataModel model) {
         hasEnemy = model.enemies;
@@ -71,6 +93,9 @@ public class GameInitState : GameState {
         hasCloud = model.cloud;
         hasTornado = model.tornado;
         hasFuel = model.fuel;
+
+        uiManager.viewGamePanel.ShowFireScoreHolder (hasFire);
+
     }
     private List<PlaneControl> LoadPlanes (int[] planes) {
         List<PlaneControl> planeControllers = new List<PlaneControl> ();

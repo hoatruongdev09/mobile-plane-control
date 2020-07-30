@@ -3,6 +3,7 @@ using UnityEngine;
 
 [Serializable]
 public class LevelDataModel {
+    public LevelDataInfo info;
     public string background;
     public string levelBackground;
     public bool enemies = false;
@@ -12,6 +13,13 @@ public class LevelDataModel {
     public bool fuel = false;
     public AirportDataModel[] airport;
     public int[] planeId;
+}
+
+[Serializable]
+public class LevelDataInfo {
+    public string id;
+    public string levelImage;
+    public int difficult;
 }
 
 [Serializable]
