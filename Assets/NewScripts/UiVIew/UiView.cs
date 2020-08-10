@@ -23,10 +23,10 @@ public abstract class UiView : MonoBehaviour {
             gameObject.SetActive (false);
         });
     }
-    protected virtual void AnimateShow (System.Action callback) {
-        canvasGroup.LeanAlpha (1, .5f).setOnComplete (callback).setIgnoreTimeScale (true);
+    protected virtual LTDescr AnimateShow (System.Action callback) {
+        return canvasGroup.LeanAlpha (1, .5f).setOnComplete (callback).setIgnoreTimeScale (true);
     }
-    protected virtual void AnimateHide (Action callback) {
-        canvasGroup.LeanAlpha (0, .5f).setOnComplete (callback).setIgnoreTimeScale (true);
+    protected virtual LTDescr AnimateHide (Action callback) {
+        return canvasGroup.LeanAlpha (0, .5f).setOnComplete (callback).setIgnoreTimeScale (true);
     }
 }

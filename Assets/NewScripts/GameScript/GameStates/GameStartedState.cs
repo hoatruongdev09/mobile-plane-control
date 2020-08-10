@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NewScript;
 using UnityEngine;
 public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDelegate {
@@ -18,12 +19,14 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     private List<PlaneControl> collidedPlanes;
     private SpawnController spawnController;
     private ScoreController scoreManager;
+    private UiManager uIControl;
     private float currentTimeSpeed = 1;
     private bool isChangingToGameOver = false;
     private LevelDifficultData difficultData;
     protected FlagCounter counter;
     protected FlagTimer timer;
     private LevelDataInfo levelInfo;
+    private object enterStateInfo;
     public GameStartedState (GameStateManager stateManager) : base (stateManager) {
         gameControl = stateManager.GameController;
         pathDrawer = gameControl.pathDrawer;
@@ -31,33 +34,16 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         spawnController = gameControl.spawnController;
         airportManager = gameControl.airportManager;
         scoreManager = gameControl.scoreManager;
+        uIControl = gameControl.uiManager;
         collidedPlanes = new List<PlaneControl> ();
         timer = new FlagTimer ();
         counter = new FlagCounter ();
     }
     public override void Enter (object options) {
-        try {
-            levelInfo = (LevelDataInfo) options.GetType ().GetProperty ("info").GetValue (options);
-        } catch (Exception e) {
-            Debug.LogError (e);
-        }
-        try {
-            var flags = options.GetType ().GetProperty ("flags").GetValue (options);
-            hasFire = (bool) flags?.GetType ().GetProperty ("hasFire").GetValue (flags);
-            hasEnemy = (bool) flags?.GetType ().GetProperty ("hasEnemy").GetValue (flags);
-            hasTornado = (bool) flags?.GetType ().GetProperty ("hasTornado").GetValue (flags);
-            hasCloud = (bool) flags.GetType ().GetProperty ("hasCloud").GetValue (flags);
-            hasFuel = (bool) flags?.GetType ().GetProperty ("hasFuel").GetValue (flags);
-        } catch (Exception e) {
-            Debug.LogError (e);
-        }
-        try {
-            difficultData = (LevelDifficultData) options.GetType ().GetProperty ("difficult").GetValue (options);
-        } catch (Exception e) {
-            Debug.LogError (e);
-            difficultData = new LevelDifficultData ();
-        }
-        OnDifficultDataInitialized (difficultData);
+        enterStateInfo = options;
+        LoadLevelInfo (options);
+        LoadGameFlags (options);
+        LoadDifficultData (options);
         Enter ();
     }
     public override void Enter () {
@@ -76,7 +62,9 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         SpawnTornadoJob ();
         SpawnFireJob ();
         SpawnCloud ();
+        TimeJob ();
     }
+
     public override void Exit () {
         gameControl.uiManager.Delegate = null;
 
@@ -86,22 +74,42 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         scoreManager.onCurrentFireExtinguishedChanges -= gameControl.uiManager.viewGamePanel.SetBestFireExtinguished;
 
     }
+    private void LoadLevelInfo (object options) {
+        try {
+            levelInfo = (LevelDataInfo) options.GetType ().GetProperty ("info").GetValue (options);
+        } catch (Exception e) {
+            Debug.LogError (e);
+        }
+    }
+    private void LoadGameFlags (object options) {
+        try {
+            var flags = options.GetType ().GetProperty ("flags").GetValue (options);
+            hasFire = (bool) flags?.GetType ().GetProperty ("hasFire").GetValue (flags);
+            hasEnemy = (bool) flags?.GetType ().GetProperty ("hasEnemy").GetValue (flags);
+            hasTornado = (bool) flags?.GetType ().GetProperty ("hasTornado").GetValue (flags);
+            hasCloud = (bool) flags.GetType ().GetProperty ("hasCloud").GetValue (flags);
+            hasFuel = (bool) flags?.GetType ().GetProperty ("hasFuel").GetValue (flags);
+        } catch (Exception e) {
+            Debug.LogError (e);
+        }
+    }
+    private void LoadDifficultData (object options) {
+        try {
+            difficultData = (LevelDifficultData) options.GetType ().GetProperty ("difficult").GetValue (options);
+        } catch (Exception e) {
+            Debug.LogError (e);
+            difficultData = new LevelDifficultData ();
+        }
+        OnDifficultDataInitialized (difficultData);
+    }
+
     protected virtual void StartAnimate () {
         var lastTimeSpeed = Time.timeScale;
         LeanTween.value (gameControl.gameObject, lastTimeSpeed, currentTimeSpeed, .5f).setOnUpdate ((float value) => {
             Time.timeScale = value;
         }).setIgnoreTimeScale (true);
     }
-    protected virtual void OnPlaneCollided (PlaneControl plane) {
-        AddCollidedPlane (plane);
-        gameControl.StartCoroutine (DelayToEndGame (0.1f, () => {
-            stateManager.StateMachine.ChangeState (stateManager.OverState, new {
-                collidedPlanes = this.collidedPlanes,
-                    info = this.levelInfo
-            });
-        }));
 
-    }
     private void AddCollidedPlane (PlaneControl plane) {
         if (collidedPlanes.Contains (plane)) { return; }
         collidedPlanes.Add (plane);
@@ -155,10 +163,50 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         detectedPlane.Deselect ();
         detectedPlane = null;
     }
-    public void OnPlaneLanded (PlaneControl plane) {
+    protected virtual void OnPlaneCollided (PlaneControl plane) {
+        SoundController.Instance?.PlaneCrash ();
+        AddCollidedPlane (plane);
+        gameControl.StartCoroutine (DelayToEndGame (() => {
+            stateManager.StateMachine.ChangeState (stateManager.OverState, new {
+                collidedPlanes = this.collidedPlanes,
+                    info = this.levelInfo
+            });
+        }));
+
+    }
+    protected virtual void OnPlaneSelect (PlaneControl plane, bool action) {
+        SoundController.Instance?.PlaySFX (SoundController.Instance?.planeSelect);
+    }
+    protected virtual void OnPlaneDangerWaning (PlaneControl plane) {
+        SoundController.Instance?.PlaneWarning ();
+    }
+    protected virtual void OnPlaneLanded (PlaneControl plane) {
+        SoundController.Instance?.PlaySFX (SoundController.Instance.planeLanded);
         plane.Delete ();
         scoreManager.AddLandedPlane (1);
         counter.CurrentPlaneCount--;
+        CheckIfLevelWillUnlockByPlane ();
+    }
+    private void CheckIfLevelWillUnlockByPlane () {
+        Debug.Log ($"{PlayerSection.Instance == null} | {DataManager.Instance == null}");
+        if (PlayerSection.Instance == null) { return; }
+        if (DataManager.Instance == null) { return; }
+        foreach (var levelData in DataManager.Instance.LevelData) {
+            Debug.Log ($"check level data id: {levelData.info.id}");
+            if (levelData.info.unlockType == (int) LevelDataInfo.UnlockType.landed && levelData.info.unlock <= PlayerSection.Instance.PlayerData.totalPlaneLanded) {
+                if (PlayerSection.Instance.PlayerData.unlockedLevel.Contains (levelData.info.id)) {
+                    Debug.Log ($"contain level data id: {levelData.info.id}");
+                    continue;
+                }
+
+                var unlockedLevel = PlayerSection.Instance.PlayerData.unlockedLevel.ToList ();
+                unlockedLevel.Add (levelData.info.id);
+                PlayerSection.Instance.PlayerData.unlockedLevel = unlockedLevel.ToArray ();
+                Debug.Log ($"UNLOCK LEVEL: {levelData.info.id}");
+                uIControl.viewGamePanel.ShowAnnouncer ($"Level <b>{levelData.info.name}</b> unlocked");
+            }
+        }
+        PlayerSection.Instance.SaveSection ();
     }
     public void OnAddLandingPlane () {
         detectedPlane.SetLanding (detectedAirport);
@@ -187,36 +235,48 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     public void OnPauseClick () {
         stateManager.StateMachine.ChangeState (stateManager.PauseState);
     }
-    private IEnumerator DelayToEndGame (float time, Action callback) {
+    private IEnumerator DelayToEndGame (Action callback) {
         if (!isChangingToGameOver) {
             isChangingToGameOver = true;
-            yield return new WaitForSecondsRealtime (time);
+            yield return new WaitForEndOfFrame ();
             callback ();
         }
     }
     private void OnDifficultDataInitialized (LevelDifficultData difficultData) {
-        timer.currentPlaneSpawnTiming = difficultData.planeCreateInterval / 2;
-        timer.currentCloudSpawnTiming = difficultData.cloudCreateInterval / 2;
-        timer.currentFireSpawnTiming = difficultData.createFireInterval / 2;
-        timer.currentTornadoSpawnTiming = difficultData.createTornadoInterval / 2;
+        timer.currentPlaneSpawnTiming = difficultData.planeCreateInterval / 8;
+        timer.currentCloudSpawnTiming = difficultData.cloudCreateInterval / 8;
+        timer.currentFireSpawnTiming = difficultData.createFireInterval / 8;
+        timer.currentTornadoSpawnTiming = difficultData.createTornadoInterval / 8;
     }
     protected void SpawnPlaneJob () {
-        if (counter.CurrentPlaneCount > difficultData.maxPlaneInTime) { return; }
+        if (counter.CurrentPlaneCount > difficultData.maxPlaneInTime || difficultData.maxPlaneInTime == -1) { return; }
+        if (counter.CurrentPlaneCount > scoreManager.MostPlaneInScreen) {
+            scoreManager.MostPlaneInScreen = (int) counter.CurrentPlaneCount;
+        }
         timer.currentPlaneSpawnTiming += Time.deltaTime;
         if (timer.currentPlaneSpawnTiming >= difficultData.planeCreateInterval) {
-            var randomAirport = airportManager.RandomAirport ();
-            PlaneControl plane = null;
             try {
-                plane = spawnController.CreateAPlaneForAirport (randomAirport, hasFire, hasFuel && GetChance (difficultData.lowFuelChance), difficultData.fuelTimeRangeMin, difficultData.fuelTimeRangeMax);
-                plane.onPlaneLanded += this.OnPlaneLanded;
-                plane.onCollidedWithPlane += this.OnPlaneCollided;
+                CreatePlane ();
                 timer.currentPlaneSpawnTiming = 0;
-                counter.CurrentPlaneCount++;
             } catch (Exception e) {
                 Debug.Log (e);
             }
         }
     }
+    private void CreatePlane () {
+        try {
+            var randomAirport = airportManager.RandomAirport ();
+            PlaneControl plane = null;
+            plane = spawnController.CreateAPlaneForAirport (randomAirport, hasFire && GetChance (difficultData.waterChance), hasFuel && GetChance (difficultData.lowFuelChance), difficultData.fuelTimeRangeMin, difficultData.fuelTimeRangeMax);
+            plane.onPlaneLanded += this.OnPlaneLanded;
+            plane.onCollidedWithPlane += this.OnPlaneCollided;
+            plane.onShowWarning += this.OnPlaneDangerWaning;
+            plane.onPlaneSelect += this.OnPlaneSelect;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     protected void SpawnTornadoJob () {
         if (!hasTornado) { return; }
         if (counter.CurrentTornadoCount > difficultData.maxTornadoInTime) { return; }
@@ -273,6 +333,17 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         cloud.DestroySelf ();
         counter.CurrentCloudCount--;
     }
+    /// <summary>
+    /// tạo độ khó cho game, 
+    /// giảm thời gian các giới hạn của bộ đếm giờ
+    /// </summary>
+    private void TimeJob () {
+        difficultData.planeCreateInterval = Mathf.Clamp (difficultData.planeCreateInterval - 0.01f * Time.deltaTime, 1, Mathf.Infinity);
+        difficultData.cloudCreateInterval = Mathf.Clamp (difficultData.cloudCreateInterval - 0.01f * Time.deltaTime, 1, Mathf.Infinity);
+        difficultData.createFireInterval = Mathf.Clamp (difficultData.createFireInterval - 0.01f * Time.deltaTime, 1, Mathf.Infinity);
+        difficultData.createTornadoInterval = Mathf.Clamp (difficultData.createTornadoInterval - .01f * Time.deltaTime, 1, Mathf.Infinity);
+        difficultData.enemyCreateInterval = Mathf.Clamp (difficultData.enemyCreateInterval - 0.01f * Time.deltaTime, 1, Mathf.Infinity);
+    }
 
     private bool GetChance (float input) {
         return UnityEngine.Random.Range (0, 101) <= input;
@@ -282,27 +353,27 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
 }
 
 public class FlagCounter {
-    public float CurrentPlaneCount {
+    public int CurrentPlaneCount {
         get { return currentPlaneCount; }
-        set { currentPlaneCount = Mathf.Clamp (value, 0, Mathf.Infinity); Debug.Log ($"current plane count: {currentPlaneCount}"); }
+        set { currentPlaneCount = value; Debug.Log ($"current plane count: {currentPlaneCount}"); }
     }
-    public float CurrentCloudCount {
+    public int CurrentCloudCount {
         get { return currentCloudCount; }
-        set { currentCloudCount = Mathf.Clamp (value, 0, Mathf.Infinity); }
+        set { currentCloudCount = value; }
     }
-    public float CurrentFireCount {
+    public int CurrentFireCount {
         get { return currentFireCount; }
-        set { currentFireCount = Mathf.Clamp (value, 0, Mathf.Infinity); }
+        set { currentFireCount = value; }
     }
-    public float CurrentTornadoCount {
+    public int CurrentTornadoCount {
         get { return currentTornadoCount; }
-        set { currentCloudCount = Mathf.Clamp (value, 0, Mathf.Infinity); }
+        set { currentCloudCount = value; }
     }
 
-    private float currentPlaneCount;
-    private float currentCloudCount;
-    private float currentFireCount;
-    private float currentTornadoCount;
+    private int currentPlaneCount;
+    private int currentCloudCount;
+    private int currentFireCount;
+    private int currentTornadoCount;
     public FlagCounter () {
         Reset ();
     }

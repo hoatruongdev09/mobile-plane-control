@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 public class GameInitState : GameState {
     private UiManager uiManager;
@@ -36,7 +37,9 @@ public class GameInitState : GameState {
         LoadLevelData (levelData);
         LoadDifficultData (difficult);
         Enter ();
+        InitSound ();
     }
+
     public override void Enter () {
         controller.StartCoroutine (DelayStartGame (() => {
             stateManager.StateMachine.ChangeState (stateManager.StartedState, new {
@@ -66,26 +69,23 @@ public class GameInitState : GameState {
     }
     private void LoadLevelData (string levelData) {
         string filePath = $"LevelData/{levelData}";
+        Debug.Log ($"file path: {filePath}");
         TextAsset textFile = Resources.Load<TextAsset> (filePath);
         Debug.Log ($"level data: {textFile.text}");
         LevelDataModel levelDataModel = JsonUtility.FromJson<LevelDataModel> (textFile.text);
         airportManager.Airports = CreateAirports (levelDataModel.airport);
         spawnController.ListPlanes = LoadPlanes (levelDataModel.planeId);
-        LoadMapBackground (levelDataModel.background);
-        LoadLevelBackground (levelDataModel.levelBackground);
+        LoadMapBackground (levelDataModel.levelBackground);
+        LoadSceneBackground (levelDataModel.sceneBackground);
         LoadGameFlags (levelDataModel);
         levelInfo = levelDataModel.info;
         LoadSavedScore (levelInfo.id);
         levelLoaded = true;
     }
     private void LoadSavedScore (string levelID) {
-        if (!PlayerPrefs.HasKey (levelID)) { return; }
-        string jsonData = PlayerPrefs.GetString (levelID);
-        var savedScore = JsonUtility.FromJson<LevelScoreInfo> (jsonData);
-
-        Debug.Log ($"saved data: {savedScore}");
-        scoreController.BestFireExtinguished = savedScore.bestFireExtinguished;
-        scoreController.BestScore = savedScore.bestLandedScore;
+        scoreController.LoadSavedScore (levelID);
+        uiManager.viewGamePanel.SetBestFireExtinguished (scoreController.BestFireExtinguished);
+        uiManager.viewGamePanel.SetHighScore (scoreController.BestScore);
     }
     private void LoadGameFlags (LevelDataModel model) {
         hasEnemy = model.enemies;
@@ -97,6 +97,10 @@ public class GameInitState : GameState {
         uiManager.viewGamePanel.ShowFireScoreHolder (hasFire);
 
     }
+    private List<PlaneControl> LoadPlanes (string planeFolder) {
+        var planes = Resources.LoadAll<PlaneControl> ($"Planes/{planeFolder}");
+        return planes.ToList ();
+    }
     private List<PlaneControl> LoadPlanes (int[] planes) {
         List<PlaneControl> planeControllers = new List<PlaneControl> ();
         for (int i = 0; i < planes.Length; i++) {
@@ -107,11 +111,25 @@ public class GameInitState : GameState {
         }
         return planeControllers;
     }
-    private void LoadMapBackground (string mapLink) {
-        Sprite sprite = Resources.Load<Sprite> ($"MapBackground/{mapLink}");
-        mapGraphicController.SetLevelBackground (sprite);
+
+    private void LoadSceneBackground (MapImageModel data) {
+        Sprite sprite = Resources.Load<Sprite> ($"MapBackground/{data.background}");
+        mapGraphicController.SetSceneBackground (sprite);
+        mapGraphicController.sceneBackground.transform.position = data.position.ToVector3 ();
+        mapGraphicController.sceneBackground.transform.localScale = data.scale.ToVector3 ();
+
+    }
+    private void LoadMapBackground (MapImageModel data) {
+        Sprite sprite = Resources.Load<Sprite> ($"MapBackground/{data.background}");
+        mapGraphicController.SetMapBackground (sprite);
+        mapGraphicController.mapBackground.transform.position = data.position.ToVector3 ();
+        mapGraphicController.mapBackground.transform.localScale = data.scale.ToVector3 ();
     }
     private void LoadLevelBackground (string mapLink) {
+        Sprite sprite = Resources.Load<Sprite> ($"MapBackground/{mapLink}");
+        mapGraphicController.SetSceneBackground (sprite);
+    }
+    private void LoadMapBackground (string mapLink) {
         Sprite sprite = Resources.Load<Sprite> ($"MapBackground/{mapLink}");
         mapGraphicController.SetMapBackground (sprite);
     }
@@ -145,5 +163,8 @@ public class GameInitState : GameState {
     private IEnumerator DelayStartGame (float time, Action callback) {
         yield return new WaitForSecondsRealtime (time);
         callback ();
+    }
+    private void InitSound () {
+        SoundController.Instance?.AssignButtonSound ();
     }
 }

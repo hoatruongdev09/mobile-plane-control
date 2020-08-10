@@ -34,11 +34,11 @@ public class GameOverPanelView : UiView {
     public void ButtonReset () {
         Delegate?.OnReset ();
     }
-    protected override void AnimateShow (System.Action callback) {
-        canvasGroup.LeanAlpha (1, 1f).setOnComplete (callback).setIgnoreTimeScale (true);
+    protected override LTDescr AnimateShow (System.Action callback) {
+        return canvasGroup.LeanAlpha (1, 1f).setOnComplete (callback).setIgnoreTimeScale (true);
     }
-    protected override void AnimateHide (System.Action callback) {
-        canvasGroup.LeanAlpha (0, 1f).setOnComplete (callback).setIgnoreTimeScale (true);
+    protected override LTDescr AnimateHide (System.Action callback) {
+        return canvasGroup.LeanAlpha (0, 1f).setOnComplete (callback).setIgnoreTimeScale (true);
     }
 
 }

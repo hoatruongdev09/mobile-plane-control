@@ -271,11 +271,11 @@ public class SpawnManager : MonoBehaviour {
         GameObject indicatorGO = Instantiate (indicatorPrefab, hit.point, Quaternion.Euler (0, 0, -CalculationAngle ((destinatePos - spawnPos).normalized)));
         //indicatorGO.transform.position = hit.point;
         Indicator indicate = indicatorGO.GetComponent<Indicator> ();
-        indicate.planeShape.sprite = plane.GetComponent<SpriteRenderer> ().sprite;
+        indicate.planeShape[0].sprite = plane.GetComponent<SpriteRenderer> ().sprite;
         Color color = plane.GetComponent<Plane> ().initColor;
-        indicate.planeShape.color = color;
+        indicate.planeShape[0].color = color;
         color.a = .4f;
-        indicate.planeShape.color = color;
+        indicate.planeShape[0].color = color;
         indicatorGO.transform.parent = INDICATOR_HOLDER.transform;
         //Debug.Log (hit.point);
         Debug.DrawRay (spawnPos, destinatePos - spawnPos, Color.red, 10);

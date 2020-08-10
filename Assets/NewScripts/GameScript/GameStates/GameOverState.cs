@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NewScript;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ public class GameOverState : GameState, IGameOverPanelDelegate {
     private UiManager uiManager;
     private ScoreController scoreController;
     private LevelDataInfo levelInfo;
+    private LevelScoreInfo savedLevelScore;
     public GameOverState (GameStateManager stateManager) : base (stateManager) {
         uIManager = stateManager.GameController.uiManager;
         controller = stateManager.GameController;
@@ -34,6 +36,7 @@ public class GameOverState : GameState, IGameOverPanelDelegate {
         foreach (var plane in collidedPlanes) {
             plane.HighlightCrash ();
         }
+        LoadScore ();
         ShowScoreSumUp ();
         SaveScore ();
         EndGameEffect ();
@@ -45,12 +48,29 @@ public class GameOverState : GameState, IGameOverPanelDelegate {
     public override void Exit () {
 
     }
+    private void LoadScore () {
+        savedLevelScore = scoreController.SavedScore;
+    }
     private void SaveScore () {
         var currentScoreInfo = scoreController.GetScoreInfo ();
-        var savedScore = new LevelScoreInfo ();
-        savedScore.bestLandedScore = currentScoreInfo.BestScore;
-        savedScore.bestFireExtinguished = currentScoreInfo.BestFireExtinguished;
-        string jsonData = JsonUtility.ToJson (savedScore);
+        var listCrashInfo = savedLevelScore.crashes.ToList ();
+        foreach (var planeCollided in collidedPlanes) {
+            var crash = listCrashInfo.SingleOrDefault (info => info.plane == planeCollided.name);
+            if (crash != null) {
+                crash.count++;
+            } else {
+                listCrashInfo.Add (new CrashInfo () { plane = planeCollided.name.Replace ("(Clone)", ""), count = 1 });
+            }
+        }
+        savedLevelScore.crashes = listCrashInfo.ToArray ();
+        savedLevelScore.playTime += 1;
+        savedLevelScore.totalAircaftLanded += currentScoreInfo.CurrentLandedPlanes;
+        savedLevelScore.averageScore = savedLevelScore.totalAircaftLanded / savedLevelScore.playTime;
+        savedLevelScore.mostRecentScore = currentScoreInfo.CurrentLandedPlanes;
+        savedLevelScore.bestLandedScore = currentScoreInfo.BestScore;
+        savedLevelScore.bestFireExtinguished = currentScoreInfo.BestFireExtinguished;
+        savedLevelScore.mostAircraftsOnScreen = currentScoreInfo.MostPlaneOnScreen;
+        string jsonData = JsonUtility.ToJson (savedLevelScore);
         PlayerPrefs.SetString (levelInfo.id, jsonData);
         Debug.Log ($"saved data: {PlayerPrefs.GetString(levelInfo.id)}");
     }
@@ -60,7 +80,7 @@ public class GameOverState : GameState, IGameOverPanelDelegate {
     }
     private void EndGameEffect () {
         var currentTimeSpeed = Time.timeScale;
-        LeanTween.value (controller.gameObject, currentTimeSpeed, 0, .1f).setOnUpdate ((float value) => {
+        LeanTween.value (controller.gameObject, currentTimeSpeed, 0, .01f).setOnUpdate ((float value) => {
             Time.timeScale = Mathf.Clamp (value, 0, Mathf.Infinity);
         }).setEaseInSine ().setIgnoreTimeScale (true);
     }

@@ -7,7 +7,6 @@ public class GameController : MonoBehaviour {
     public OnPlaneCollided onPlaneCollided { get; set; }
     public int MaxTimeSpeed { get { return maxTimeSpeed; } }
     public bool IsPause { get; set; }
-
     public PathDrawer pathDrawer;
     public AirportManager airportManager;
     public ScoreController scoreManager;
@@ -30,17 +29,33 @@ public class GameController : MonoBehaviour {
         mainCamera = Camera.main;
         stateMachine = new StateMachine ();
         stateManager = new GameStateManager (this, stateMachine);
-        stateMachine.Start (stateManager.InitState, new { level = "levelDataSample", difficult = "levelDifficultSample" });
+        StartCoroutine (InitializeCoroutine ());
     }
 
     private void Update () {
-        stateMachine.CurrentState.Update ();
+        stateMachine.CurrentState?.Update ();
     }
 
     public void RestartGame () {
         SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
     }
     public void BackToMenu () {
-
+        StartCoroutine (DelayBackToMenu ());
+    }
+    private IEnumerator DelayBackToMenu () {
+        PlayerSection.Instance?.SaveSection ();
+        yield return null;
+        SceneManager.LoadScene (0);
+    }
+    private IEnumerator InitializeCoroutine () {
+        var selectedLevel = "levelDataSample";
+        var selectedDifficult = "levelDifficultSample";
+        if (PlayerSection.Instance) {
+            selectedLevel = PlayerSection.Instance.LastChooseLevelID;
+        }
+        yield return new WaitForEndOfFrame ();
+        stateMachine.Start (stateManager.InitState, new { level = selectedLevel, difficult = selectedDifficult });
+        yield return new WaitUntil (() => AdsController.Instance != null);
+        AdsController.Instance.RequestBannerAd ();
     }
 }

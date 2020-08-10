@@ -1,0 +1,77 @@
+{
+  "info": {
+    "id": "City",
+    "name": "City",
+    "levelImage": "fix levels-02",
+    "difficult": 5,
+    "unlock": 2000,
+    "unlockType": 0,
+    "loadOption": { "sceneLoading": "default" }
+  },
+  "levelBackground": {
+    "background": "fix levels-2",
+    "position": { "x": 0.0, "y": 0.0 },
+    "scale": { "x": 10.0, "y": 10.0 },
+    "rotation": 0.0
+  },
+  "sceneBackground": {
+    "background": "fix levels-2",
+    "position": { "x": 0.0, "y": 0.0 },
+    "scale": { "x": 9.0, "y": 9.0 },
+    "rotation": 0.0
+  },
+  "enemies": false,
+  "fire": false,
+  "cloud": false,
+  "tornado": false,
+  "fuel": false,
+  "airport": [
+    {
+      "name": "helipad",
+      "type": "round",
+      "position": { "x": -10.0, "y": -20.0 },
+      "rotation": 0.0,
+      "planeTag": "blue",
+      "color": "#9B59B6",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "airport_Orange",
+      "type": "long",
+      "position": { "x": 20.0, "y": 7.0 },
+      "rotation": 0.0,
+      "planeTag": "orange",
+      "color": "#E67E22",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "airport_Yellow",
+      "type": "long",
+      "position": { "x": -20.0, "y": 7.0 },
+      "rotation": 0.0,
+      "planeTag": "yellow",
+      "color": "#E74C3C",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "helipad",
+      "type": "round",
+      "position": { "x": 10.0, "y": -20.0 },
+      "rotation": 0.0,
+      "planeTag": "red",
+      "color": "#F1C40F",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "airport_Green",
+      "type": "long",
+      "position": { "x": 0.0, "y": 7.0 },
+      "rotation": 0.0,
+      "planeTag": "green",
+      "color": "#2ECC71",
+      "scale": { "x": 6.0, "y": 6.0 }
+    }
+  ],
+  "planeId": [45, 56, 36, 37, 31, 20, 27, 35, 34, 32, 41, 40, 39, 38],
+  "enemyId": []
+}

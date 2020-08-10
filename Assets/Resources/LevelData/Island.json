@@ -1,0 +1,59 @@
+{
+  "info": {
+    "id": "Island",
+    "name": "Island",
+    "levelImage": "fix levels-04",
+    "difficult": 1,
+    "unlock": 0,
+    "unlockType": 0,
+    "loadOption": { "sceneLoading": "default" }
+  },
+  "levelBackground": {
+    "background": "levels_island copy 7",
+    "position": { "x": 0.0, "y": 0.0 },
+    "scale": { "x": 1.0, "y": 1.0 },
+    "rotation": 0.0
+  },
+  "sceneBackground": {
+    "background": "fix levels preview-04",
+    "position": { "x": 0.0, "y": 0.0 },
+    "scale": { "x": 10.0, "y": 10.0 },
+    "rotation": 0.0
+  },
+  "enemies": false,
+  "fire": false,
+  "cloud": false,
+  "tornado": false,
+  "fuel": false,
+  "airport": [
+    {
+      "name": "airport_Yellow",
+      "type": "long",
+      "position": { "x": 5.900000095367432, "y": 12.399999618530274 },
+      "rotation": 242.70001220703126,
+      "planeTag": "yellow",
+      "color": "#9B59B6",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "helipad",
+      "type": "round",
+      "position": { "x": 28.600000381469728, "y": 2.9000000953674318 },
+      "rotation": 0.0,
+      "planeTag": "blue",
+      "color": "#2ECC71",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "airport_Green",
+      "type": "long",
+      "position": { "x": 16.899999618530275, "y": -15.800000190734864 },
+      "rotation": 334.29998779296877,
+      "planeTag": "green",
+      "color": "#3498DB",
+      "scale": { "x": 6.0, "y": 6.0 }
+    }
+  ],
+  "planeId": [32, 24, 31, 40, 39, 38, 35, 25, 27, 34],
+  "enemyId": []
+}

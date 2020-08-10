@@ -40,4 +40,8 @@ public class PlaneWaterComponent : MonoBehaviour, IPlaneComponent {
             processBar.Percent = (MaxWater - currentWater) / MaxWater;
         }
     }
+
+    public void UpdateEffect (PlaneControl plane) {
+
+    }
 }

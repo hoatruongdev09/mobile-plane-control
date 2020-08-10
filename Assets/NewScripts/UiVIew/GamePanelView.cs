@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 public class GamePanelView : UiView {
     public IGamePanelViewDelegate Delegate { get; set; }
-
-    [SerializeField] public Text textCurrentFireExtinguished;
-    [SerializeField] public Text textBestFireExtinguished;
-    [SerializeField] public Text textCurrentLandedPlane;
-    [SerializeField] public Text textHighScore;
-    [SerializeField] public Button buttonPause;
-    [SerializeField] public Button buttonFastForward;
-    [SerializeField] public Text textSpeedIndicate;
+    public AnnouncerView announcerViewPrefab;
+    public Text textCurrentFireExtinguished;
+    public Text textBestFireExtinguished;
+    public Text textCurrentLandedPlane;
+    public Text textHighScore;
+    public Button buttonPause;
+    public Button buttonFastForward;
+    public Text textSpeedIndicate;
     public RectTransform fireScoreHolder;
     private void OnEnable () {
         UpdateTextSpeedIndicate ();
@@ -52,6 +52,14 @@ public class GamePanelView : UiView {
     }
     public void ShowFireScoreHolder (bool action) {
         fireScoreHolder.gameObject.SetActive (action);
+    }
+    public void ShowAnnouncer (string content) {
+        var announcer = Instantiate (announcerViewPrefab, transform);
+        announcer.transform.localScale = Vector3.one;
+        (announcer.transform as RectTransform).anchoredPosition = new Vector2 (0, Random.Range (70, 100));
+        announcer.Show ();
+        announcer.AnimateFly (30);
+        announcer.Hide ().setDelay (30 - 0.4f);
     }
 
 }

@@ -37,4 +37,8 @@ public class PlaneFuelComponent : MonoBehaviour, IPlaneComponent {
     private void OnDestroy () {
         Destroy (fuelAnnouncer.gameObject);
     }
+
+    public void UpdateEffect (PlaneControl plane) {
+
+    }
 }

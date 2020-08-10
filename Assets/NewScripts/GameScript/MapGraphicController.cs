@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class MapGraphicController : MonoBehaviour {
     public SpriteRenderer mapBackground;
-    public SpriteRenderer levelBackground;
+    public SpriteRenderer sceneBackground;
 
     public void SetMapBackground (Sprite sprite) {
         mapBackground.sprite = sprite;
     }
-    public void SetLevelBackground (Sprite sprite) {
-        levelBackground.sprite = sprite;
+    public void SetSceneBackground (Sprite sprite) {
+        sceneBackground.sprite = sprite;
     }
 }

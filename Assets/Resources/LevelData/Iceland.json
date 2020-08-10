@@ -1,0 +1,59 @@
+{
+  "info": {
+    "id": "Iceland",
+    "name": "Iceland",
+    "levelImage": "fix levels-05",
+    "difficult": 4,
+    "unlock": 1500,
+    "unlockType": 0,
+    "loadOption": { "sceneLoading": "default" }
+  },
+  "levelBackground": {
+    "background": "fix levels preview-05",
+    "position": { "x": 0.0, "y": 0.0 },
+    "scale": { "x": 10.0, "y": 10.0 },
+    "rotation": 0.0
+  },
+  "sceneBackground": {
+    "background": "fix levels preview-05",
+    "position": { "x": 0.0, "y": 0.0 },
+    "scale": { "x": 7.0, "y": 7.0 },
+    "rotation": 0.0
+  },
+  "enemies": false,
+  "fire": false,
+  "cloud": false,
+  "tornado": false,
+  "fuel": true,
+  "airport": [
+    {
+      "name": "airport_Yellow",
+      "type": "long",
+      "position": { "x": 7.0, "y": 6.599999904632568 },
+      "rotation": 255.70001220703126,
+      "planeTag": "yellow",
+      "color": "#E74C3C",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "helipad",
+      "type": "round",
+      "position": { "x": -17.0, "y": 0.699999988079071 },
+      "rotation": 0.0,
+      "planeTag": "blue",
+      "color": "#3498DB",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "airport_Green",
+      "type": "long",
+      "position": { "x": 3.4000000953674318, "y": -10.699999809265137 },
+      "rotation": 282.3000183105469,
+      "planeTag": "green",
+      "color": "#F1C40F",
+      "scale": { "x": 6.0, "y": 6.0 }
+    }
+  ],
+  "planeId": [41, 40, 39, 38, 7, 3, 2, 1, 0],
+  "enemyId": []
+}

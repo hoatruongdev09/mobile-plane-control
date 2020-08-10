@@ -1,0 +1,59 @@
+{
+  "info": {
+    "id": "Mother Ship",
+    "name": "Mother Ship",
+    "levelImage": "fix levels-03",
+    "difficult": 4,
+    "unlock": 750,
+    "unlockType": 0,
+    "loadOption": { "sceneLoading": "default" }
+  },
+  "levelBackground": {
+    "background": "fix levels preview-03",
+    "position": { "x": 0.0, "y": 0.0 },
+    "scale": { "x": 10.0, "y": 10.0 },
+    "rotation": 0.0
+  },
+  "sceneBackground": {
+    "background": "fix levels preview-03",
+    "position": { "x": 0.0, "y": 0.0 },
+    "scale": { "x": 7.0, "y": 7.0 },
+    "rotation": 0.0
+  },
+  "enemies": false,
+  "fire": false,
+  "cloud": false,
+  "tornado": false,
+  "fuel": false,
+  "airport": [
+    {
+      "name": "airport_Yellow",
+      "type": "long",
+      "position": { "x": 2.0, "y": 9.0 },
+      "rotation": 134.49998474121095,
+      "planeTag": "yellow",
+      "color": "#9B59B6",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "helipad",
+      "type": "round",
+      "position": { "x": -33.0, "y": -7.0 },
+      "rotation": 0.0,
+      "planeTag": "blue",
+      "color": "#2ECC71",
+      "scale": { "x": 6.0, "y": 6.0 }
+    },
+    {
+      "name": "airport_Green",
+      "type": "long",
+      "position": { "x": 35.70000076293945, "y": 16.899999618530275 },
+      "rotation": 115.20001983642578,
+      "planeTag": "green",
+      "color": "#3498DB",
+      "scale": { "x": 6.0, "y": 6.0 }
+    }
+  ],
+  "planeId": [9, 8, 10, 11, 15, 23, 46, 42, 43, 33],
+  "enemyId": []
+}

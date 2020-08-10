@@ -14,6 +14,8 @@ public class SpawnController : MonoBehaviour {
         set { enemies = value; }
     }
     public Cloud[] cloudPrefabs;
+    [SerializeField] private List<PlaneControl> planes;
+    [SerializeField] private List<GameObject> enemies;
     public NewWaterDrop waterDropPrefab;
     public GameObject warningSign;
     public ProcessBarGame processBarPrefab;
@@ -30,8 +32,7 @@ public class SpawnController : MonoBehaviour {
     private GameObject forestFireHolder;
     private GameObject fuelHolder;
     private GameObject cloudHolder;
-    private List<PlaneControl> planes;
-    private List<GameObject> enemies;
+
     private void Awake () {
         planesHolder = new GameObject ("PlanesHolder");
         indicateHolder = new GameObject ("IndicateHolder");
@@ -97,6 +98,7 @@ public class SpawnController : MonoBehaviour {
         }
         var plane = Instantiate (acceptedPlanes[Random.Range (0, acceptedPlanes.Length)], spawnPosition, Quaternion.Euler (0, 0, -CalculationAngle (destinatePosition - spawnPosition)));
         plane.transform.SetParent (planesHolder.transform);
+        AddShadowComponent (plane);
         if (hasWater) {
             AddWaterComponent (plane, Random.Range (100, 120));
         }
@@ -117,6 +119,10 @@ public class SpawnController : MonoBehaviour {
         water.MaxWater = maxWater;
         water.AttachToPlane (plane);
     }
+    private void AddShadowComponent (PlaneControl plane) {
+        var shadow = plane.gameObject.AddComponent<PlaneShadowComponent> ();
+        shadow.AttachToPlane (plane);
+    }
     private void AddFuelComponent (PlaneControl plane, float minTime, float maxTime) {
         var fuel = plane.gameObject.AddComponent<PlaneFuelComponent> ();
         if (fuel == null) {
@@ -130,11 +136,13 @@ public class SpawnController : MonoBehaviour {
         return Mathf.Atan2 (direction.x, direction.y) * Mathf.Rad2Deg;
     }
     private void SpawnIndicator (PlaneControl plane, Vector3 spawnPos, Vector3 destinatePos) {
-        RaycastHit2D hit = Physics2D.Raycast (spawnPos, destinatePos - spawnPos, Mathf.Infinity, LayerMask.GetMask ("border"));
-        Indicator indicatorGO = Instantiate (indicatorPrefab, hit.point, Quaternion.Euler (0, 0, -CalculationAngle ((destinatePos - spawnPos).normalized)));
-        indicatorGO.planeShape.sprite = plane.graphics[0].sprite;
-        indicatorGO.planeShape.color = plane.baseColor;
+        Vector2 planeDirect = (destinatePos - spawnPos);
+        RaycastHit2D hit = Physics2D.Raycast (spawnPos, planeDirect, Mathf.Infinity, LayerMask.GetMask ("border"));
+        Indicator indicatorGO = Instantiate (indicatorPrefab, hit.point + planeDirect.normalized * 8, Quaternion.Euler (0, 0, -CalculationAngle ((destinatePos - spawnPos).normalized)));
+        indicatorGO.CreatePlanShape (plane.graphics, plane.baseColor);
+        // indicatorGO.planeShape[0].sprite = plane.graphics[0].sprite;
+        // indicatorGO.planeShape[0].color = plane.baseColor;
         indicatorGO.transform.SetParent (indicateHolder.transform);
-        Debug.DrawRay (spawnPos, destinatePos - spawnPos, Color.red, 10);
+        // Debug.DrawRay (spawnPos, destinatePos - spawnPos, Color.red, 10);
     }
 }

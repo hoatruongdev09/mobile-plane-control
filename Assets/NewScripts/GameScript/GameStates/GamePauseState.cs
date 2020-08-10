@@ -26,7 +26,10 @@ public class GamePauseState : GameState, IPausePanelDelegate {
         uiManager.ClosePanel (uiManager.viewPausePanel, () => { });
         AnimateUnpause ();
     }
-    public void OnMusicInteract () { }
+    public void OnMusicInteract () {
+
+        SoundController.Instance.UseAudio = !SoundController.Instance.UseAudio;
+    }
 
     public void OnPauseClick () {
 
@@ -37,7 +40,9 @@ public class GamePauseState : GameState, IPausePanelDelegate {
         });
     }
 
-    public void OnSoundInteract () { }
+    public void OnSoundInteract () {
+        SoundController.Instance.UseSoundFX = !SoundController.Instance.UseSoundFX;
+    }
 
     private void AnimatePause () {
         if (isAnimatePause) { return; }

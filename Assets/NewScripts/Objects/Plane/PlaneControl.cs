@@ -4,13 +4,15 @@ using NewScript;
 using UnityEngine;
 
 public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCheckerDelegate {
-    public OnLanded onPlaneLanded { get; set; }
-    public OnCollidedWithPlane onCollidedWithPlane { get; set; }
+    public PlaneInteractEvent onPlaneLanded { get; set; }
+    public PlaneInteractEvent onCollidedWithPlane { get; set; }
+    public PlaneInteractEvent onShowWarning { get; set; }
+    public PlaneSelectEvent onPlaneSelect { get; set; }
     public IPlaneBehavior PlaneBehaviorDelegate { get; set; }
     public ITriggerCheckerDelegate TriggerCheckerDelegate { get; set; }
     public ICollisionCheckerDelegate CollisionCheckerDelegate { get; set; }
-    public delegate void OnLanded (PlaneControl plane);
-    public delegate void OnCollidedWithPlane (PlaneControl plane);
+    public delegate void PlaneInteractEvent (PlaneControl plane);
+    public delegate void PlaneSelectEvent (PlaneControl plane, bool action);
     public bool IsSelected {
         get { return isSelect; }
         set {
@@ -55,7 +57,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     public ColliderChecker detectorChecker;
     public ColliderChecker bodyCollider;
     public NewScript.Path path;
-    private List<IPlaneComponent> components;
+    private List<IPlaneComponent> components = new List<IPlaneComponent> ();
     private PlaneStateManager stateManager;
     private StateMachine stateMachine;
     private bool isReadyToLand = false;
@@ -71,7 +73,6 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
 
     }
     private void Init () {
-        components = new List<IPlaneComponent> ();
 
         path.Controller = this;
 
@@ -88,7 +89,11 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     }
     private void Update () {
         stateMachine.CurrentState?.Update ();
+        foreach (var component in components) {
+            component.UpdateEffect (this);
+        }
     }
+
     public void SetColor (Color color) {
         baseColor = color;
         foreach (var graphic in graphics) {
@@ -151,6 +156,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
 
     private void OnSelect (bool value) {
         isSelect = value;
+        onPlaneSelect?.Invoke (this, isSelect);
         PlaneBehaviorDelegate?.OnSelect (isSelect);
         if (!IsReadyToLand) {
             path.DeactivateEndPoint (isSelect);
@@ -168,6 +174,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     }
     public void OnCheckerTriggerEnter2D (ColliderChecker checker, Collider2D other) {
         if (checker == detectorChecker && other.tag != "forestfire") {
+            onShowWarning?.Invoke (this);
             ActiveWarningIndicator (true);
         }
         if (checker == bodyCollider) {
