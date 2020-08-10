@@ -47,6 +47,7 @@ public class DataManager : MonoBehaviour {
             return playerData;
         }
         var jsonData = PlayerPrefs.GetString ("player-data");
+        Debug.Log ($"data: {jsonData}");
         playerData = JsonUtility.FromJson<PlayerData> (jsonData);
         return playerData;
     }

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource {
     public static MainGameManager Instance { get; set; }
+    public bool isTest = true;
     public MainUiManager mainUiManager;
     [SerializeField] private DataManager dataManager;
     private void Awake () {
@@ -27,7 +28,7 @@ public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource {
             info.mapName = data.info.name;
             info.difficult = data.info.difficult;
             info.mapImageSprite = Resources.Load<Sprite> ($"Level_Image/{data.info.levelImage}");
-            info.unlocked = PlayerSection.Instance.PlayerData.unlockedLevel.Contains (data.info.id);
+            info.unlocked = isTest || PlayerSection.Instance.PlayerData.unlockedLevel.Contains (data.info.id);
             if (!info.unlocked && (LevelDataInfo.UnlockType) data.info.unlockType == LevelDataInfo.UnlockType.landed) {
                 info.mapInfo = $"Land {data.info.unlock - PlayerSection.Instance.PlayerData .totalPlaneLanded} planes to unlock!";
             }
