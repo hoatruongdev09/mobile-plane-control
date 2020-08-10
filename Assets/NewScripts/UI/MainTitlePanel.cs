@@ -31,6 +31,7 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
         buttonQuit.onClick.AddListener (ButtonQuit);
         buttonShop.onClick.AddListener (ButtonShop);
         mapSelectView.Delegate = this;
+        shopView.Delegate = this;
         yield return null;
         Enter ();
         yield return new WaitUntil (() => PurchaseController.Instance != null);
@@ -138,6 +139,7 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
     }
 
     public void OnPurchaseRemoveAd () {
+        Debug.Log ("purchase ad");
         PurchaseController.Instance.PurchaseRemoveAd ();
     }
 

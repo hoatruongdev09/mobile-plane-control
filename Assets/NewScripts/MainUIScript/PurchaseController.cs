@@ -39,6 +39,7 @@ public class PurchaseController : MonoBehaviour {
         UnityPurchasing.Initialize (listener, builder);
     }
     public void PurchaseRemoveAd () {
+        Debug.Log ("purchase ad in controller");
         var product = StoreController.products.WithID (RemoveAdID);
         StoreController.InitiatePurchase (product);
     }
