@@ -38,7 +38,7 @@ public class Crashing : PlaneState {
     private void StartCrashing () {
         AnimateCrashing ().setOnComplete (() => {
             crashed = true;
-            controller.onCollidedWithPlane?.Invoke (controller);
+            controller.onPlaneCrash?.Invoke (controller);
         }).setEaseInBack ().setOnUpdate ((Vector3 value) => {
             crashingSpeed += Time.deltaTime;
         });

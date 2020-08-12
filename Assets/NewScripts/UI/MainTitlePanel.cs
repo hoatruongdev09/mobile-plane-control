@@ -144,13 +144,14 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
     }
 
     public void OnInitializeFailed (InitializationFailureReason error) {
-        Debug.Log ("Initialize purchase failed");
+        Debug.LogError ($"Initialize purchase failed: {error.ToString()}");
     }
 
     public PurchaseProcessingResult ProcessPurchase (PurchaseEventArgs e) {
         if (e.purchasedProduct.definition.id == PurchaseController.Instance.RemoveAdID) {
             Debug.Log ("remove ad");
             shopView.DisableButtonRemoveAd ();
+            CrossSceneData.Instance.IsRemoveAd = true;
             shopView.ShowPurchaseResult ("Purchase Complete", "Ads are removed");
         }
         return PurchaseProcessingResult.Complete;
@@ -162,6 +163,14 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
 
     public void OnInitialized (IStoreController controller, IExtensionProvider extensions) {
         Debug.Log ("Initialize purchase done");
+        PurchaseController.Instance.StoreController = controller;
+        PurchaseController.Instance.StoreProvider = extensions;
+
+        if (controller.products.WithID (PurchaseController.Instance.RemoveAdID).hasReceipt) {
+            shopView.DisableButtonRemoveAd ();
+            Debug.Log ("WTFF REMOVE AD ?");
+            CrossSceneData.Instance.IsRemoveAd = true;
+        }
     }
 }
 public interface IMainTitlePanelDelegate {

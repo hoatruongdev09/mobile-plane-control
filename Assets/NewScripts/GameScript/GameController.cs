@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour {
     public AirportManager airportManager;
     public ScoreController scoreManager;
     public SpawnController spawnController;
+    public AdsController adsController;
     public MapGraphicController mapGraphicController;
     public UiManager uiManager;
     public Camera mainCamera;
@@ -55,7 +56,12 @@ public class GameController : MonoBehaviour {
         }
         yield return new WaitForEndOfFrame ();
         stateMachine.Start (stateManager.InitState, new { level = selectedLevel, difficult = selectedDifficult });
+        yield return new WaitUntil (() => CrossSceneData.Instance != null);
         yield return new WaitUntil (() => AdsController.Instance != null);
-        AdsController.Instance.RequestBannerAd ();
+        adsController = AdsController.Instance;
+        Debug.Log ($"is remove ad: {CrossSceneData.Instance.IsRemoveAd}");
+        if (!CrossSceneData.Instance.IsRemoveAd) {
+            adsController.RequestBannerAd ();
+        }
     }
 }

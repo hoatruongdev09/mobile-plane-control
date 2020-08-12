@@ -27,6 +27,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     protected FlagTimer timer;
     private LevelDataInfo levelInfo;
     private object enterStateInfo;
+    private bool isContinue;
     public GameStartedState (GameStateManager stateManager) : base (stateManager) {
         gameControl = stateManager.GameController;
         pathDrawer = gameControl.pathDrawer;
@@ -40,11 +41,13 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         counter = new FlagCounter ();
     }
     public override void Enter (object options) {
-        enterStateInfo = options;
-        LoadLevelInfo (options);
-        LoadGameFlags (options);
-        LoadDifficultData (options);
-        Enter ();
+        var continueOver = options.GetType ().GetProperty ("continueOver");
+        Debug.Log ($"continue over: {continueOver == null}");
+        if (continueOver != null) {
+            EnterContinue (options);
+        } else {
+            EnterNewGame (options);
+        }
     }
     public override void Enter () {
         gameControl.uiManager.viewGamePanel.Delegate = this;
@@ -66,6 +69,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     }
 
     public override void Exit () {
+        isContinue = false;
         gameControl.uiManager.Delegate = null;
 
         scoreManager.onBestScoreChanges -= gameControl.uiManager.viewGamePanel.SetHighScore;
@@ -73,6 +77,30 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         scoreManager.onBestFireExtinguishedChange -= gameControl.uiManager.viewGamePanel.SetCurrentFireExtinguished;
         scoreManager.onCurrentFireExtinguishedChanges -= gameControl.uiManager.viewGamePanel.SetBestFireExtinguished;
 
+    }
+    private void EnterNewGame (object options) {
+        enterStateInfo = options;
+        LoadLevelInfo (options);
+        LoadGameFlags (options);
+        LoadDifficultData (options);
+        Enter ();
+    }
+    private void EnterContinue (object options) {
+        isContinue = true;
+        List<PlaneControl> crashedPlane = (List<PlaneControl>) options.GetType ().GetProperty ("crashedPlanes").GetValue (options);
+        ClearCrashedPlane (crashedPlane);
+        Enter ();
+        BackToNormal (15);
+    }
+    private void BackToNormal (float time) {
+        float startTime = time;
+        uIControl.viewGamePanel.textTextCrashAcceptTime.gameObject.SetActive (true);
+        LeanTween.value (gameControl.gameObject, startTime, 0, time).setOnUpdate ((float value) => {
+            uIControl.viewGamePanel.textTextCrashAcceptTime.text = $"Crash accept time: {Mathf.RoundToInt(value)}";
+        }).setOnComplete (() => {
+            isContinue = false;
+            uIControl.viewGamePanel.textTextCrashAcceptTime.gameObject.SetActive (false);
+        });
     }
     private void LoadLevelInfo (object options) {
         try {
@@ -163,8 +191,45 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         detectedPlane.Deselect ();
         detectedPlane = null;
     }
+    private void ClearCrashedPlane (List<PlaneControl> crashedPlane) {
+        foreach (var plane in crashedPlane) {
+            plane.BlowUp ();
+            spawnController.CreateBlowEffect (plane.transform.position, spawnController.inAirBlowEffectPrefab);
+            SoundController.Instance?.PlaneCrash ();
+        }
+        foreach (var plane in collidedPlanes) {
+            plane.BlowUp ();
+            spawnController.CreateBlowEffect (plane.transform.position, spawnController.inAirBlowEffectPrefab);
+            SoundController.Instance?.PlaneCrash ();
+        }
+        collidedPlanes.Clear ();
+    }
     protected virtual void OnPlaneCollided (PlaneControl plane) {
         SoundController.Instance?.PlaneCrash ();
+        Debug.Log ($"is continue: {isContinue}");
+        if (isContinue) {
+            var fxObject = spawnController.CreateBlowEffect (plane.transform.position, spawnController.inAirBlowEffectPrefab);
+            plane.BlowUp ();
+            return;
+        }
+        AddCollidedPlane (plane);
+        gameControl.StartCoroutine (DelayToEndGame (() => {
+            stateManager.StateMachine.ChangeState (stateManager.OverState, new {
+                collidedPlanes = this.collidedPlanes,
+                    info = this.levelInfo
+
+            });
+            isChangingToGameOver = false;
+        }));
+
+    }
+    protected void OnPlaneCrashed (PlaneControl plane) {
+        SoundController.Instance?.PlaneCrash ();
+        if (isContinue) {
+            spawnController.CreateBlowEffect (plane.transform.position, spawnController.crashBlowEffectPrefab);
+            plane.BlowUp ();
+            return;
+        }
         AddCollidedPlane (plane);
         gameControl.StartCoroutine (DelayToEndGame (() => {
             stateManager.StateMachine.ChangeState (stateManager.OverState, new {
@@ -172,13 +237,16 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
                     info = this.levelInfo
             });
         }));
-
     }
     protected virtual void OnPlaneSelect (PlaneControl plane, bool action) {
         SoundController.Instance?.PlaySFX (SoundController.Instance?.planeSelect);
     }
     protected virtual void OnPlaneDangerWaning (PlaneControl plane) {
+        if (isContinue) {
+            return;
+        }
         SoundController.Instance?.PlaneWarning ();
+        plane.ActiveWarningIndicator (true);
     }
     protected virtual void OnPlaneLanded (PlaneControl plane) {
         SoundController.Instance?.PlaySFX (SoundController.Instance.planeLanded);
@@ -232,7 +300,10 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
             currentTimeSpeed = Time.timeScale;
         }).setIgnoreTimeScale (true);
     }
-    public void OnPauseClick () {
+    public virtual void OnPauseClick () {
+        if (isContinue) {
+            return;
+        }
         stateManager.StateMachine.ChangeState (stateManager.PauseState);
     }
     private IEnumerator DelayToEndGame (Action callback) {
@@ -270,6 +341,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
             plane = spawnController.CreateAPlaneForAirport (randomAirport, hasFire && GetChance (difficultData.waterChance), hasFuel && GetChance (difficultData.lowFuelChance), difficultData.fuelTimeRangeMin, difficultData.fuelTimeRangeMax);
             plane.onPlaneLanded += this.OnPlaneLanded;
             plane.onCollidedWithPlane += this.OnPlaneCollided;
+            plane.onPlaneCrash += this.OnPlaneCrashed;
             plane.onShowWarning += this.OnPlaneDangerWaning;
             plane.onPlaneSelect += this.OnPlaneSelect;
         } catch (Exception e) {

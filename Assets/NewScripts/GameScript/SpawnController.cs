@@ -25,6 +25,9 @@ public class SpawnController : MonoBehaviour {
     public Airport helipadPrefab;
     public Airport airportPrefab;
     public Indicator indicatorPrefab;
+    public GameObject crashBlowEffectPrefab;
+    public GameObject inAirBlowEffectPrefab;
+    public GameObject winSockPrefab;
     private GameObject planesHolder;
     private GameObject indicateHolder;
     private GameObject airportHolder;
@@ -44,6 +47,11 @@ public class SpawnController : MonoBehaviour {
         if (Instance == null) {
             Instance = this;
         }
+    }
+    public GameObject CreateBlowEffect (Vector3 position, GameObject effect) {
+        var fx = Instantiate (effect, position, Quaternion.Euler (0, 0, Random.Range (0, 359)));
+        Destroy (fx, 1);
+        return fx;
     }
     public Cloud CreateCloud (Vector3 position) {
         return Instantiate (cloudPrefabs[Random.Range (0, cloudPrefabs.Length)], position, Quaternion.identity, cloudHolder.transform);

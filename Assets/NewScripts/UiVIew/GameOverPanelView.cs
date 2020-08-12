@@ -19,6 +19,9 @@ public class GameOverPanelView : UiView {
         buttonMainMenu.onClick.AddListener (ButtonMainMenu);
         buttonReset.onClick.AddListener (ButtonReset);
     }
+    public void DisableWatchAdButton () {
+        buttonWatchAdToContinues?.gameObject?.SetActive (false);
+    }
     public void ButtonWatchAd () {
         Delegate?.OnWatchAd ();
     }

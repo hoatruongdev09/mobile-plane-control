@@ -7,6 +7,7 @@ public class PlayerData {
     public string[] unlockedLevel;
     public string lastPlayedLevelID;
     public SettingData settingData = new SettingData ();
+
 }
 
 [Serializable]

@@ -18,6 +18,8 @@ public class ShopView : UiView {
     }
     public void DisableButtonRemoveAd () {
         buttonRemoveAd.interactable = false;
+        var text = buttonRemoveAd.GetComponentInChildren<Text> ();
+        text.text = "Purchased";
     }
     public void ShowPurchaseResult (string title, string content) {
         NotificationAnnouncerView announcerPrefab = Resources.Load<NotificationAnnouncerView> ("UI/PanelPurchaseResult");

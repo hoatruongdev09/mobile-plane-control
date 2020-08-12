@@ -49,6 +49,9 @@ public class AdsController : MonoBehaviour {
         bannerAd.OnAdClosed += HandleBannerClosed;
         bannerAd.OnAdLeavingApplication += HandleBannerLeaving;
     }
+    public void CloseBannerAd () {
+        this.bannerAd.Hide ();
+    }
     public void RequestBannerAd () {
         AdRequest request = new AdRequest.Builder ().Build ();
         this.bannerAd.LoadAd (request);
@@ -66,7 +69,9 @@ public class AdsController : MonoBehaviour {
     }
 
     private void HandleBannerFailedToLoad (object sender, AdFailedToLoadEventArgs e) {
+        Debug.Log ($"banner failed to load: {e.Message}");
         BannerAdDelegate?.HandleBannerFailedToLoad (sender, e);
+        RequestBannerAd ();
     }
 
     private void HandleBannerLoaded (object sender, EventArgs e) {
@@ -93,15 +98,18 @@ public class AdsController : MonoBehaviour {
     }
     public void HandleRewardedAdFailedToLoad (object sender, AdErrorEventArgs args) {
         RewardAdDelegate?.HandleRewardedAdFailedToLoad (sender, args);
+        RequestRewardAd ();
     }
     public void HandleRewardedAdOpening (object sender, EventArgs args) {
         RewardAdDelegate?.HandleRewardedAdOpening (sender, args);
     }
     public void HandleRewardedAdFailedToShow (object sender, AdErrorEventArgs args) {
         RewardAdDelegate?.HandleRewardedAdFailedToShow (sender, args);
+        RequestRewardAd ();
     }
     public void HandleRewardedAdClosed (object sender, EventArgs args) {
         RewardAdDelegate?.HandleRewardedAdClosed (sender, args);
+        RequestRewardAd ();
     }
     public void HandleUserEarnedReward (object sender, Reward args) {
         RewardAdDelegate?.HandleUserEarnedReward (sender, args);
@@ -109,12 +117,17 @@ public class AdsController : MonoBehaviour {
     public void RequestRewardAd () {
         AdRequest request = new AdRequest.Builder ().Build ();
         rewardedAd.LoadAd (request);
+
+    }
+    public bool RewardAdLoaded () {
+        return rewardedAd.IsLoaded ();
     }
     public bool ShowRewardAd () {
         if (rewardedAd.IsLoaded ()) {
             this.rewardedAd.Show ();
             return true;
         } else {
+            RequestRewardAd ();
             return false;
         }
     }

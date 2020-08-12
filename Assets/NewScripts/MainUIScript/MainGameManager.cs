@@ -67,6 +67,8 @@ public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource {
         mainUiManager.HideFader (() => {
             mainUiManager.mainTitlePanel.Show ();
         });
+        yield return new WaitUntil (() => AdsController.Instance != null);
+        AdsController.Instance?.CloseBannerAd ();
         yield return null;
     }
 }

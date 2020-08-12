@@ -9,6 +9,7 @@ public class GamePanelView : UiView {
     public Text textBestFireExtinguished;
     public Text textCurrentLandedPlane;
     public Text textHighScore;
+    public Text textTextCrashAcceptTime;
     public Button buttonPause;
     public Button buttonFastForward;
     public Text textSpeedIndicate;

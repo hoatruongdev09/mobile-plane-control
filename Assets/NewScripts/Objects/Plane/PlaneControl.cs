@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCheckerDelegate {
     public PlaneInteractEvent onPlaneLanded { get; set; }
     public PlaneInteractEvent onCollidedWithPlane { get; set; }
+    public PlaneInteractEvent onPlaneCrash { get; set; }
     public PlaneInteractEvent onShowWarning { get; set; }
     public PlaneSelectEvent onPlaneSelect { get; set; }
     public IPlaneBehavior PlaneBehaviorDelegate { get; set; }
@@ -153,7 +154,10 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     public void Delete () {
         Destroy (gameObject);
     }
-
+    public void BlowUp () {
+        Debug.Log ("show animate blow up");
+        Destroy (gameObject);
+    }
     private void OnSelect (bool value) {
         isSelect = value;
         onPlaneSelect?.Invoke (this, isSelect);
@@ -165,7 +169,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
             IsReadyToLand = false;
         }
     }
-    private void ActiveWarningIndicator (bool action) {
+    public void ActiveWarningIndicator (bool action) {
         var targetAlpha = action ? 1 : 0;
         var startAlpha = warningIndicate.color.a;
         LeanTween.value (warningIndicate.gameObject, startAlpha, targetAlpha, .1f).setOnUpdate ((float value) => {
@@ -175,7 +179,6 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     public void OnCheckerTriggerEnter2D (ColliderChecker checker, Collider2D other) {
         if (checker == detectorChecker && other.tag != "forestfire") {
             onShowWarning?.Invoke (this);
-            ActiveWarningIndicator (true);
         }
         if (checker == bodyCollider) {
             if (other.tag == "hurricane") {

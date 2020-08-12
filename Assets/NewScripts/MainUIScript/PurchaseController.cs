@@ -9,7 +9,7 @@ public class PurchaseController : MonoBehaviour {
     public bool IsInitialized {
         get { return StoreController != null && StoreProvider != null; }
     }
-    private string removeAdId = "removed_ad";
+    private string removeAdId = "remove_ad";
     public IStoreListener StoreListener { get; set; }
     public IStoreController StoreController { get; set; }
     public IExtensionProvider StoreProvider { get; set; }
