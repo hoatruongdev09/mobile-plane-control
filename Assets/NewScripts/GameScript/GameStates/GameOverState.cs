@@ -146,11 +146,19 @@ public class GameOverState : GameState, IGameOverPanelDelegate, IRewardAdDelegat
         }
     }
     public void OnViewAchievement () {
-
+        GameServiceController.Instance?.ShowAchievemenUI ((success) => {
+            if (!success) {
+                GameServiceController.Instance?.Authenticate ();
+            }
+        });
     }
 
     public void OnViewLeaderboard () {
-
+        GameServiceController.Instance?.ShowLeaderboardUI ((success) => {
+            if (!success) {
+                GameServiceController.Instance?.Authenticate ();
+            }
+        });
     }
 
     public void OnBackToMenu () {

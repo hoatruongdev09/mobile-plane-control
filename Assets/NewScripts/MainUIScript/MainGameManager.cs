@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource {
+public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource, IMainTitleDatasource {
     public static MainGameManager Instance { get; set; }
     public bool isTest = true;
     public MainUiManager mainUiManager;
@@ -19,6 +19,7 @@ public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource {
     private void Start () {
         dataManager = DataManager.Instance;
         mainUiManager.mainTitlePanel.mapSelectView.Datasource = this;
+        mainUiManager.mainTitlePanel.Datasource = this;
         StartCoroutine (InitializationCoroutine ());
     }
     public MapSelectItemInfo GetMapInfoByID (int id) {
@@ -28,7 +29,7 @@ public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource {
             info.mapName = data.info.name;
             info.difficult = data.info.difficult;
             info.mapImageSprite = Resources.Load<Sprite> ($"Level_Image/{data.info.levelImage}");
-            info.unlocked = isTest || PlayerSection.Instance.PlayerData.unlockedLevel.Contains (data.info.id);
+            info.unlocked = isTest || PlayerSection.Instance.PlayerData.unlockedLevel.Contains (data.info.id) || PurchaseController.Instance.CheckIfUnlockAllLevelPurchased ();
             if (!info.unlocked && (LevelDataInfo.UnlockType) data.info.unlockType == LevelDataInfo.UnlockType.landed) {
                 info.mapInfo = $"Land {data.info.unlock - PlayerSection.Instance.PlayerData .totalPlaneLanded} planes to unlock!";
             }
@@ -69,6 +70,9 @@ public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource {
         });
         yield return new WaitUntil (() => AdsController.Instance != null);
         AdsController.Instance?.CloseBannerAd ();
+        yield return new WaitUntil (() => GameServiceController.Instance != null);
+        GameServiceController.Instance.Authenticate ();
+
         yield return null;
     }
 }

@@ -29,7 +29,14 @@ public class SettingsView : UiView {
         }
     }
     private void ButtonVibrate () {
-
+        if (PlayerSection.Instance == null) { return; }
+        PlayerSection.Instance.PlayerData.settingData.useVibrate = !PlayerSection.Instance.PlayerData.settingData.useVibrate;
+        if (PlayerSection.Instance.PlayerData.settingData.useVibrate) {
+            Handheld.Vibrate ();
+            AnimateOn (buttonVibrate);
+        } else {
+            AnimateOff (buttonVibrate);
+        }
     }
 
     private void AnimateOn (Button button) {

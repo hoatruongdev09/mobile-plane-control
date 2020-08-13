@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,21 +10,25 @@ public class PausePanelView : UiView {
     public Button buttonRestart;
     public Button buttonSound;
     public Button buttonMusic;
+    public Button buttonVibrate;
 
     private void Start () {
         buttonSound.onClick.AddListener (ButtonSound);
         buttonMusic.onClick.AddListener (ButtonMusic);
+        buttonVibrate.onClick.AddListener (ButtonVibrate);
         buttonMainMenu.onClick.AddListener (ButtonMainMenu);
         buttonContinue.onClick.AddListener (ButtonContinue);
         buttonRestart.onClick.AddListener (ButtonRestart);
         Init ();
     }
+
     private void Init () {
         if (SoundController.Instance == null) {
             return;
         }
         AnimateMusic ();
         AnimateSound ();
+        AnimateVibrate ();
     }
 
     private void ButtonMainMenu () {
@@ -35,6 +40,12 @@ public class PausePanelView : UiView {
     private void ButtonRestart () {
         Delegate?.OnRestart ();
     }
+    private void ButtonVibrate () {
+        Delegate?.OnVibrateInteract ();
+        if (PlayerSection.Instance == null) { return; }
+        StartCoroutine (DelayUseOption (AnimateVibrate));
+    }
+
     private void ButtonSound () {
         Delegate?.OnSoundInteract ();
         if (SoundController.Instance == null) {
@@ -84,6 +95,21 @@ public class PausePanelView : UiView {
             }
         }).setIgnoreTimeScale (true);
     }
+    public void AnimateVibrate () {
+        var image = buttonVibrate.GetComponent<Image> ();
+        var imageChild = buttonVibrate.GetComponentsInChildren<Image> ();
+        if (LeanTween.isTweening (image.gameObject)) {
+            LeanTween.cancel (image.gameObject);
+        }
+        float currentAlpha = image.color.a;
+        float destinateAlpha = PlayerSection.Instance.PlayerData.settingData.useVibrate?1: .1f;
+        LeanTween.value (image.gameObject, currentAlpha, destinateAlpha, .15f).setOnUpdate ((float value) => {
+            image.color = new Color (image.color.r, image.color.g, image.color.b, value);
+            foreach (var child in imageChild) {
+                child.color = new Color (child.color.r, child.color.g, child.color.b, value);
+            }
+        }).setIgnoreTimeScale (true);
+    }
     private IEnumerator DelayUseOption (System.Action callback) {
 
         yield return new WaitForEndOfFrame ();
@@ -109,4 +135,5 @@ public interface IPausePanelDelegate {
     void OnRestart ();
     void OnSoundInteract ();
     void OnMusicInteract ();
+    void OnVibrateInteract ();
 }

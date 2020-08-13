@@ -28,6 +28,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     private LevelDataInfo levelInfo;
     private object enterStateInfo;
     private bool isContinue;
+    private bool isOver = false;
     public GameStartedState (GameStateManager stateManager) : base (stateManager) {
         gameControl = stateManager.GameController;
         pathDrawer = gameControl.pathDrawer;
@@ -50,6 +51,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         }
     }
     public override void Enter () {
+        isOver = false;
         gameControl.uiManager.viewGamePanel.Delegate = this;
 
         scoreManager.onBestScoreChanges += gameControl.uiManager.viewGamePanel.SetHighScore;
@@ -69,7 +71,9 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     }
 
     public override void Exit () {
+        isOver = true;
         isContinue = false;
+
         gameControl.uiManager.Delegate = null;
 
         scoreManager.onBestScoreChanges -= gameControl.uiManager.viewGamePanel.SetHighScore;
@@ -204,8 +208,15 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         }
         collidedPlanes.Clear ();
     }
+    private void Vibrate () {
+        if (PlayerSection.Instance == null) { return; }
+        if (PlayerSection.Instance.PlayerData.settingData.useVibrate) {
+            Handheld.Vibrate ();
+        }
+    }
     protected virtual void OnPlaneCollided (PlaneControl plane) {
         SoundController.Instance?.PlaneCrash ();
+        Vibrate ();
         Debug.Log ($"is continue: {isContinue}");
         if (isContinue) {
             var fxObject = spawnController.CreateBlowEffect (plane.transform.position, spawnController.inAirBlowEffectPrefab);
@@ -225,6 +236,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     }
     protected void OnPlaneCrashed (PlaneControl plane) {
         SoundController.Instance?.PlaneCrash ();
+        Vibrate ();
         if (isContinue) {
             spawnController.CreateBlowEffect (plane.transform.position, spawnController.crashBlowEffectPrefab);
             plane.BlowUp ();
@@ -238,7 +250,11 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
             });
         }));
     }
+    private void OnPlaneInteractWithObjects (PlaneControl plane) {
+        Vibrate ();
+    }
     protected virtual void OnPlaneSelect (PlaneControl plane, bool action) {
+        // Vibrate ();
         SoundController.Instance?.PlaySFX (SoundController.Instance?.planeSelect);
     }
     protected virtual void OnPlaneDangerWaning (PlaneControl plane) {
@@ -266,10 +282,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
                     Debug.Log ($"contain level data id: {levelData.info.id}");
                     continue;
                 }
-
-                var unlockedLevel = PlayerSection.Instance.PlayerData.unlockedLevel.ToList ();
-                unlockedLevel.Add (levelData.info.id);
-                PlayerSection.Instance.PlayerData.unlockedLevel = unlockedLevel.ToArray ();
+                PlayerSection.Instance?.AddUnlockedLevel (levelData.info.id);
                 Debug.Log ($"UNLOCK LEVEL: {levelData.info.id}");
                 uIControl.viewGamePanel.ShowAnnouncer ($"Level <b>{levelData.info.name}</b> unlocked");
             }
@@ -285,8 +298,10 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     }
 
     public void OnFastForward () {
+        if (isOver) {
+            return;
+        }
         float nextTimeSpeed = Mathf.FloorToInt (Time.timeScale + 1);
-        // Debug.Log ($"current: {Time.timeScale} next speed: {nextTimeSpeed}");
         if (nextTimeSpeed > gameControl.MaxTimeSpeed) {
             nextTimeSpeed = 1;
         }
@@ -344,6 +359,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
             plane.onPlaneCrash += this.OnPlaneCrashed;
             plane.onShowWarning += this.OnPlaneDangerWaning;
             plane.onPlaneSelect += this.OnPlaneSelect;
+            plane.onCollideWithInteractedObject += this.OnPlaneInteractWithObjects;
         } catch (Exception e) {
             throw e;
         }

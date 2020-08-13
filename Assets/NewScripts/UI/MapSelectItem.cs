@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class MapSelectItem : MonoBehaviour {
-    public OnChoose onChoose { get; set; }
+    public OnItemInteract onChoose { get; set; }
+    public OnItemInteract onQuickUnlock { get; set; }
+
     public int ID { get { return id; } set { id = value; Debug.Log ($"id: {id}"); } }
     public Image mapImage;
     public Image mapLock;
@@ -11,11 +14,18 @@ public class MapSelectItem : MonoBehaviour {
     public Text textInfo;
     public GameObject[] starts;
     public Button button;
+    public Button buttonButtonUnlockNow;
     private int id;
-    public delegate void OnChoose (int id);
+    public delegate void OnItemInteract (int id);
     private void Start () {
         button.onClick.AddListener (ButtonClick);
+        buttonButtonUnlockNow.onClick.AddListener (ButtonUnlockNow);
     }
+
+    private void ButtonUnlockNow () {
+        onQuickUnlock?.Invoke (ID);
+    }
+
     private void ButtonClick () {
         onChoose?.Invoke (ID);
     }

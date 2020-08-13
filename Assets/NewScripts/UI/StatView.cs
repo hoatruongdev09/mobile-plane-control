@@ -46,9 +46,17 @@ public class StatView : UiView {
         }
     }
     private void ButtonAchievement () {
-
+        GameServiceController.Instance?.ShowAchievemenUI ((success) => {
+            if (!success) {
+                GameServiceController.Instance?.Authenticate ();
+            }
+        });
     }
     private void ButtonLeaderboard () {
-
+        GameServiceController.Instance?.ShowLeaderboardUI ((success) => {
+            if (!success) {
+                GameServiceController.Instance?.Authenticate ();
+            }
+        });
     }
 }

@@ -44,6 +44,10 @@ public class GamePauseState : GameState, IPausePanelDelegate {
         SoundController.Instance.UseSoundFX = !SoundController.Instance.UseSoundFX;
     }
 
+    public void OnVibrateInteract () {
+        PlayerSection.Instance.PlayerData.settingData.useVibrate = !PlayerSection.Instance.PlayerData.settingData.useVibrate;
+    }
+
     private void AnimatePause () {
         if (isAnimatePause) { return; }
         isAnimatePause = true;

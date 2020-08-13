@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.UI;
+
 public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate, IStoreListener {
     public IMainTitlePanelDelegate Delegate { get; set; }
+    public IMainTitleDatasource Datasource { get; set; }
     public Button buttonStats;
     public Button buttonTutorials;
     public Button buttonSettings;
@@ -35,9 +40,11 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
         yield return null;
         Enter ();
         yield return new WaitUntil (() => PurchaseController.Instance != null);
+        yield return new WaitUntil (() => DataManager.Instance != null);
         Debug.Log ("Purchaser instance ready");
         var purchaser = PurchaseController.Instance;
-        purchaser.Initialize (this);
+        var listLevelName = DataManager.Instance.LevelData.Select (LevelData => { return LevelData.info.name; }).ToArray ();
+        purchaser.Initialize (this, listLevelName);
     }
     private void ChangeView (UiView nextView) {
         if (nextView == CurrentView) { return; }
@@ -104,6 +111,14 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
             Debug.LogError ($"choose item error: {e}");
         }
     }
+    public void OnItemQuickUnlock (int id) {
+        if (Datasource == null) { return; }
+        var levelInfo = Datasource.GetMapInfoByID (id);
+        Debug.Log ($"prepare purchase {levelInfo.mapName}");
+        PurchaseController.Instance?.PurchaseLevel (levelInfo.mapName);
+        // PlayerSection.Instance.AddUnlockedLevel (levelInfo.mapName);
+        // mapSelectView.ShowUnlockResult ("Unlock completed", "City is available to play !");
+    }
     private void LoadDataForItem (int id) {
         Debug.Log ($"chose {id}");
         try {
@@ -142,25 +157,45 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
         Debug.Log ("purchase ad");
         PurchaseController.Instance.PurchaseRemoveAd ();
     }
-
+    public void OnPurchaseUnlockAllLevel () {
+        Debug.Log ("purchase all level");
+        PurchaseController.Instance.PurchaseUnlockAllLevels ();
+    }
     public void OnInitializeFailed (InitializationFailureReason error) {
         Debug.LogError ($"Initialize purchase failed: {error.ToString()}");
     }
 
     public PurchaseProcessingResult ProcessPurchase (PurchaseEventArgs e) {
-        if (e.purchasedProduct.definition.id == PurchaseController.Instance.RemoveAdID) {
-            Debug.Log ("remove ad");
+        var purchaseProductId = e.purchasedProduct.definition.id;
+        if (purchaseProductId == PurchaseController.Instance.RemoveAdID) {
+            Debug.Log ("remove ad purchased");
             shopView.DisableButtonRemoveAd ();
             CrossSceneData.Instance.IsRemoveAd = true;
-            shopView.ShowPurchaseResult ("Purchase Complete", "Ads are removed");
+            shopView.ShowPurchaseResult ("Purchase Complete", "Ads are removed !");
+        } else if (purchaseProductId == PurchaseController.Instance.UnlockAllLevelsdID) {
+            Debug.Log ("unlock all world purchased");
+            shopView.DisableButtonUnlockAllLevel ();
+            shopView.ShowPurchaseResult ("Purchase Complete", "All level unlocked !");
+        } else if (purchaseProductId.Contains (PurchaseController.Instance.UnlockLevelID)) {
+            var levelName = purchaseProductId.Replace (PurchaseController.Instance.UnlockLevelID, "").Replace (".", " ").ToLower ();
+            levelName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase (levelName.ToLower ());
+            mapSelectView.ShowUnlockResult ("Unlock completed", $"{levelName} is available to play !");
+            PlayerSection.Instance.AddUnlockedLevel (levelName);
         }
+        Debug.Log ($"product id: ${purchaseProductId.Contains("unlock_level_")}");
         return PurchaseProcessingResult.Complete;
     }
 
     public void OnPurchaseFailed (Product i, PurchaseFailureReason p) {
-        shopView.ShowPurchaseResult ("Purchase Failed", $"{p.ToString()}");
+        if (i.definition.id == $"{PurchaseController.Instance.UnlockLevelID}City") {
+            mapSelectView.ShowUnlockResult ("Unlock failed", $"{ParsePurchaseErrorToString(p)}");
+            return;
+        }
+        shopView.ShowPurchaseResult ("Purchase Failed", $"{ParsePurchaseErrorToString(p)}");
     }
-
+    private string ParsePurchaseErrorToString (PurchaseFailureReason p) {
+        return Regex.Replace (p.ToString (), "([a-z])([A-Z])", "$1 $2");
+    }
     public void OnInitialized (IStoreController controller, IExtensionProvider extensions) {
         Debug.Log ("Initialize purchase done");
         PurchaseController.Instance.StoreController = controller;
@@ -170,8 +205,15 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
             shopView.DisableButtonRemoveAd ();
             Debug.Log ("WTFF REMOVE AD ?");
             CrossSceneData.Instance.IsRemoveAd = true;
+        } else if (controller.products.WithID (PurchaseController.Instance.RemoveAdID).hasReceipt) {
+            Debug.Log ("unlocked all world");
+            shopView.DisableButtonUnlockAllLevel ();
         }
     }
+
+}
+public interface IMainTitleDatasource {
+    MapSelectItemInfo GetMapInfoByID (int id);
 }
 public interface IMainTitlePanelDelegate {
     void OnChooseLevel (int id);

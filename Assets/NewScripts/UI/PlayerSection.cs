@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerSection : MonoBehaviour {
@@ -24,6 +25,12 @@ public class PlayerSection : MonoBehaviour {
         if (Instance == null) {
             Instance = this;
         }
+    }
+    public void AddUnlockedLevel (string levelName) {
+        if (playerData.unlockedLevel.Contains (levelName)) { return; }
+        var listUnlockedLevel = playerData.unlockedLevel.ToList ();
+        listUnlockedLevel.Add (levelName);
+        playerData.unlockedLevel = listUnlockedLevel.ToArray ();
     }
     public void SaveSection () {
         var jsonData = JsonUtility.ToJson (PlayerData);

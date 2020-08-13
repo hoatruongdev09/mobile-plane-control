@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCheckerDelegate {
     public PlaneInteractEvent onPlaneLanded { get; set; }
     public PlaneInteractEvent onCollidedWithPlane { get; set; }
+    public PlaneInteractEvent onCollideWithInteractedObject { get; set; }
     public PlaneInteractEvent onPlaneCrash { get; set; }
     public PlaneInteractEvent onShowWarning { get; set; }
     public PlaneSelectEvent onPlaneSelect { get; set; }
@@ -182,8 +183,12 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
         }
         if (checker == bodyCollider) {
             if (other.tag == "hurricane") {
+                onCollideWithInteractedObject?.Invoke (this);
                 var reflectDirect = transform.position - other.transform.position;
                 stateMachine.ChangeState (stateManager.StateFreeFly, new { effect = true, stun = true, direct = reflectDirect });
+            }
+            if (other.tag == "cloud") {
+                onCollideWithInteractedObject?.Invoke (this);
             }
         }
         TriggerCheckerDelegate?.OnCheckerTriggerEnter2D (checker, other);

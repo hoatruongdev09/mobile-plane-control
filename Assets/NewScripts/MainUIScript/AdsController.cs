@@ -40,6 +40,7 @@ public class AdsController : MonoBehaviour {
         InitializeRewardAd ();
         InitializeBannerAd ();
     }
+    #region BANNER AD
     private void InitializeBannerAd () {
         AdSize size = new AdSize (320, 50);
         bannerAd = new BannerView (bannerAdUnit, size, AdPosition.Top);
@@ -48,6 +49,9 @@ public class AdsController : MonoBehaviour {
         bannerAd.OnAdOpening += HandleBannerOpen;
         bannerAd.OnAdClosed += HandleBannerClosed;
         bannerAd.OnAdLeavingApplication += HandleBannerLeaving;
+    }
+    public void ShowBannerAd () {
+        this.bannerAd.Show ();
     }
     public void CloseBannerAd () {
         this.bannerAd.Hide ();
@@ -77,7 +81,9 @@ public class AdsController : MonoBehaviour {
     private void HandleBannerLoaded (object sender, EventArgs e) {
         BannerAdDelegate?.HandleBannerLoaded (sender, e);
     }
+    #endregion
 
+    #region REWARD AD
     private void InitializeRewardAd () {
         rewardedAd = new RewardedAd (rewardedAdUnit);
         // Called when an ad request has successfully loaded.
@@ -115,12 +121,13 @@ public class AdsController : MonoBehaviour {
         RewardAdDelegate?.HandleUserEarnedReward (sender, args);
     }
     public void RequestRewardAd () {
+        InitializeRewardAd ();
         AdRequest request = new AdRequest.Builder ().Build ();
         rewardedAd.LoadAd (request);
 
     }
     public bool RewardAdLoaded () {
-        return rewardedAd.IsLoaded ();
+        return rewardedAd != null && rewardedAd.IsLoaded ();
     }
     public bool ShowRewardAd () {
         if (rewardedAd.IsLoaded ()) {
@@ -131,6 +138,7 @@ public class AdsController : MonoBehaviour {
             return false;
         }
     }
+    #endregion
 }
 public interface IBannerAdDelegate {
     void HandleBannerClosed (object sender, EventArgs e);

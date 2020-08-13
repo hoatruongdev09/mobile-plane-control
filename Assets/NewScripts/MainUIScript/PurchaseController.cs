@@ -6,10 +6,14 @@ using UnityEngine.Purchasing;
 public class PurchaseController : MonoBehaviour {
     public static PurchaseController Instance { get; set; }
     public string RemoveAdID { get { return removeAdId; } }
+    public string UnlockAllLevelsdID { get { return unlockAllLevel; } }
+    public string UnlockLevelID { get { return unlockLevel; } }
     public bool IsInitialized {
         get { return StoreController != null && StoreProvider != null; }
     }
     private string removeAdId = "remove_ad";
+    private string unlockAllLevel = "unlock_all_level";
+    private string unlockLevel = "unlock_level_";
     public IStoreListener StoreListener { get; set; }
     public IStoreController StoreController { get; set; }
     public IExtensionProvider StoreProvider { get; set; }
@@ -31,10 +35,25 @@ public class PurchaseController : MonoBehaviour {
         builder.AddProduct (removeAdId, ProductType.NonConsumable);
         UnityPurchasing.Initialize (StoreListener, builder);
     }
+
     public void Initialize (IStoreListener listener) {
         if (IsInitialized) { return; }
         var builder = ConfigurationBuilder.Instance (StandardPurchasingModule.Instance ());
         builder.AddProduct (removeAdId, ProductType.NonConsumable);
+        builder.AddProduct (unlockAllLevel, ProductType.NonConsumable);
+        StoreListener = listener;
+        UnityPurchasing.Initialize (listener, builder);
+    }
+    public void Initialize (IStoreListener listener, string[] listLevelName) {
+        if (IsInitialized) { return; }
+        var builder = ConfigurationBuilder.Instance (StandardPurchasingModule.Instance ());
+        builder.AddProduct (removeAdId, ProductType.NonConsumable);
+        builder.AddProduct (unlockAllLevel, ProductType.NonConsumable);
+        foreach (var level in listLevelName) {
+            var normalLevelName = level.Replace (" ", ".");
+            Debug.Log ($"init product: {unlockLevel}{normalLevelName.ToLower()}");
+            builder.AddProduct ($"{unlockLevel}{normalLevelName.ToLower()}", ProductType.NonConsumable);
+        }
         StoreListener = listener;
         UnityPurchasing.Initialize (listener, builder);
     }
@@ -43,7 +62,18 @@ public class PurchaseController : MonoBehaviour {
         var product = StoreController.products.WithID (RemoveAdID);
         StoreController.InitiatePurchase (product);
     }
+    public void PurchaseUnlockAllLevels () {
+        var product = StoreController.products.WithID (UnlockAllLevelsdID);
+        StoreController.InitiatePurchase (product);
+    }
+    public void PurchaseLevel (string levelName) {
+        var product = StoreController.products.WithID ($"{unlockLevel}{levelName.Replace(" ",".").ToLower()}");
+        StoreController.InitiatePurchase (product);
+    }
+    public bool CheckIfUnlockAllLevelPurchased () {
+        return StoreController.products.WithID (UnlockAllLevelsdID).hasReceipt;
+    }
     public bool CheckIfRemoveAdPurchased () {
-        return StoreController.products.WithID (removeAdId).hasReceipt;
+        return StoreController.products.WithID (RemoveAdID).hasReceipt;
     }
 }

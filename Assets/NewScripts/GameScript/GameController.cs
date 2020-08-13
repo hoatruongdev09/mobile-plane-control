@@ -45,6 +45,7 @@ public class GameController : MonoBehaviour {
     }
     private IEnumerator DelayBackToMenu () {
         PlayerSection.Instance?.SaveSection ();
+        adsController?.CloseBannerAd ();
         yield return null;
         SceneManager.LoadScene (0);
     }
@@ -62,6 +63,7 @@ public class GameController : MonoBehaviour {
         Debug.Log ($"is remove ad: {CrossSceneData.Instance.IsRemoveAd}");
         if (!CrossSceneData.Instance.IsRemoveAd) {
             adsController.RequestBannerAd ();
+            adsController.ShowBannerAd ();
         }
     }
 }
