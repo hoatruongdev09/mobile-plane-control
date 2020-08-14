@@ -17,7 +17,7 @@ public class GameController : MonoBehaviour {
     public Camera mainCamera;
     [SerializeField] private int maxTimeSpeed = 5;
     private StateMachine stateMachine;
-    private GameStateManager stateManager;
+    public GameStateManager stateManager;
     public delegate void OnPlaneCollided (PlaneControl plane);
     public delegate void OnPlaneLanded ();
     private void Awake () {

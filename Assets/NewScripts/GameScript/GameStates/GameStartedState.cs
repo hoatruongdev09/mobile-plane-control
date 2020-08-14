@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NewScript;
 using UnityEngine;
+[Serializable]
 public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDelegate {
     public bool hasEnemy;
     public bool hasFire;
@@ -14,6 +15,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
     private Camera mainCamera;
     private PlaneControl detectedPlane;
     private Airport detectedAirport;
+    [SerializeField] private List<TouchControlInfo> listTouchDetected;
     private GameController gameControl;
     private AirportManager airportManager;
     private List<PlaneControl> collidedPlanes;
@@ -40,6 +42,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         collidedPlanes = new List<PlaneControl> ();
         timer = new FlagTimer ();
         counter = new FlagCounter ();
+        listTouchDetected = new List<TouchControlInfo> ();
     }
     public override void Enter (object options) {
         var continueOver = options.GetType ().GetProperty ("continueOver");
@@ -62,7 +65,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         StartAnimate ();
     }
     public override void Update () {
-        MouseInput ();
+        InputInteract ();
         SpawnPlaneJob ();
         SpawnTornadoJob ();
         SpawnFireJob ();
@@ -82,6 +85,7 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         scoreManager.onCurrentFireExtinguishedChanges -= gameControl.uiManager.viewGamePanel.SetBestFireExtinguished;
 
     }
+
     private void EnterNewGame (object options) {
         enterStateInfo = options;
         LoadLevelInfo (options);
@@ -146,6 +150,71 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         if (collidedPlanes.Contains (plane)) { return; }
         collidedPlanes.Add (plane);
     }
+    private void InputInteract () {
+#if UNITY_ANDROID || UNITY_IOS
+        TouchInput ();
+#endif
+#if UNITY_EDITOR || UNITY_STANDALONE
+        MouseInput ();
+        // TouchInput ();
+#endif
+    }
+
+    private void oldTouchInput () {
+        if (Input.touchCount == 0) { return; }
+        var touch = Input.GetTouch (0);
+        if (touch.phase == TouchPhase.Began) {
+            DetectPath ();
+        }
+        if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) {
+            if (detectedPlane && !detectedPlane.IsStun) {
+                detectedPlane.Deselect ();
+            }
+            detectedPlane = null;
+            return;
+        }
+        if (touch.phase == TouchPhase.Moved) {
+            DrawPath (detectedPlane?.path, mainCamera.ScreenToWorldPoint (touch.position), OnMaxPointReach);
+            DetectAirport ();
+        }
+    }
+    private void TouchInput () {
+        if (Input.touchCount == 0) { return; }
+        foreach (var touch in Input.touches) {
+            TouchInput (touch);
+        }
+    }
+    private TouchControlInfo CheckIfTouchExisted (int id) {
+        foreach (var touch in listTouchDetected) {
+            if (touch.touchID == id) { return touch; }
+        }
+        return null;
+    }
+    private void TouchInput (Touch touch) {
+        Debug.Log ($"touch with id {touch.fingerId}");
+        if (touch.phase == TouchPhase.Began) {
+            if (CheckIfTouchExisted (touch.fingerId) == null) {
+                listTouchDetected.Add (new TouchControlInfo () { touchID = touch.fingerId });
+            }
+            DetectPath (touch, touch.fingerId);
+        }
+        if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) {
+            if (CheckIfTouchExisted (touch.fingerId) == null) { return; }
+            var detectedPlane = listTouchDetected[touch.fingerId].detectedPlane;
+            if (detectedPlane && !detectedPlane.IsStun) {
+                detectedPlane.Deselect ();
+            }
+            detectedPlane = null;
+        }
+        if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary) {
+            if (CheckIfTouchExisted (touch.fingerId) == null) { return; }
+            var detectedPlane = listTouchDetected[touch.fingerId].detectedPlane;
+            if (detectedPlane && !detectedPlane.IsStun && !detectedPlane.IsReadyToLand) {
+                DrawPath (detectedPlane?.Path, mainCamera.ScreenToWorldPoint (touch.position), OnMaxPointReach);
+                DetectAirport (touch, touch.fingerId);
+            }
+        }
+    }
     private void MouseInput () {
         if (Input.GetMouseButtonDown (0)) {
             DetectPath ();
@@ -161,6 +230,19 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
             DetectAirport ();
         }
     }
+    private void DetectPath (Touch touch, int touchIndex) {
+        var worldTouchPosition = mainCamera.ScreenToWorldPoint (touch.position);
+        var detectedPlane = pathDrawer.DetectPlane (worldTouchPosition);
+        var detectedEndPoint = pathDrawer.DetectEndPoint (mainCamera.ScreenToWorldPoint (worldTouchPosition));
+        if (detectedPlane) {
+            listTouchDetected[touchIndex].detectedPlane = detectedPlane;
+            listTouchDetected[touchIndex].detectedPlane.Select ();
+            listTouchDetected[touchIndex].detectedPlane.path.Clear ();
+        } else if (detectedEndPoint) {
+            listTouchDetected[touchIndex].detectedPlane = detectedEndPoint.Path.Controller;
+            listTouchDetected[touchIndex].detectedPlane.Select ();
+        }
+    }
     private void DetectPath () {
         var detectedPlane = pathDrawer.DetectPlane (mainCamera.ScreenToWorldPoint (Input.mousePosition));
         var detectedEndPoint = pathDrawer.DetectEndPoint (mainCamera.ScreenToWorldPoint (Input.mousePosition));
@@ -173,6 +255,21 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
             this.detectedPlane.Select ();
         }
 
+    }
+    private void DetectAirport (Touch touch, int touchIndex) {
+        if (CheckIfTouchExisted (touchIndex) == null) { return; }
+        var detectInfo = listTouchDetected[touchIndex];
+        if (detectInfo.detectedPlane == null) { return; }
+        var worldTouchPosition = mainCamera.ScreenToWorldPoint (touch.position);
+        var airport = pathDrawer.DetectAirport (worldTouchPosition);
+        if (airport == null) {
+            detectInfo.detectedAirport?.ClearPoints ();
+            detectInfo.detectedAirport = null;
+            return;
+        }
+        detectInfo.detectedAirport = airport;
+        detectInfo.detectedAirport.Delegate = this;
+        airport?.MultitouchRecord (worldTouchPosition, detectInfo.detectedPlane.Path, touchIndex);
     }
     private void DetectAirport () {
         if (detectedPlane == null) { return; }
@@ -209,10 +306,12 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         collidedPlanes.Clear ();
     }
     private void Vibrate () {
+#if UNITY_ANDROID || UNITY_IOS
         if (PlayerSection.Instance == null) { return; }
         if (PlayerSection.Instance.PlayerData.settingData.useVibrate) {
             Handheld.Vibrate ();
         }
+#endif
     }
     protected virtual void OnPlaneCollided (PlaneControl plane) {
         SoundController.Instance?.PlaneCrash ();
@@ -289,6 +388,17 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         }
         PlayerSection.Instance.SaveSection ();
     }
+    public void OnAddLandingPlane (int touchIndex) {
+        if (CheckIfTouchExisted (touchIndex) == null) { return; }
+        var detectInfo = listTouchDetected[touchIndex];
+        // listTouchDetected.RemoveAt (touchIndex);
+        detectInfo.detectedPlane.SetLanding (detectInfo.detectedAirport);
+        detectInfo.detectedPlane.Deselect ();
+        detectInfo.detectedPlane = null;
+        detectInfo.detectedAirport.ClearPoints ();
+        detectInfo.detectedAirport = null;
+
+    }
     public void OnAddLandingPlane () {
         detectedPlane.SetLanding (detectedAirport);
         detectedPlane.Deselect ();
@@ -329,10 +439,10 @@ public class GameStartedState : GameState, IAirportDelegate, IGamePanelViewDeleg
         }
     }
     private void OnDifficultDataInitialized (LevelDifficultData difficultData) {
-        timer.currentPlaneSpawnTiming = difficultData.planeCreateInterval / 8;
-        timer.currentCloudSpawnTiming = difficultData.cloudCreateInterval / 8;
-        timer.currentFireSpawnTiming = difficultData.createFireInterval / 8;
-        timer.currentTornadoSpawnTiming = difficultData.createTornadoInterval / 8;
+        timer.currentPlaneSpawnTiming = difficultData.planeCreateInterval * .99f;
+        timer.currentCloudSpawnTiming = difficultData.cloudCreateInterval;
+        timer.currentFireSpawnTiming = difficultData.createFireInterval;
+        timer.currentTornadoSpawnTiming = difficultData.createTornadoInterval;
     }
     protected void SpawnPlaneJob () {
         if (counter.CurrentPlaneCount > difficultData.maxPlaneInTime || difficultData.maxPlaneInTime == -1) { return; }
@@ -489,4 +599,11 @@ public class FlagTimer {
         currentTornadoSpawnTiming = 0;
         currentFireSpawnTiming = 0;
     }
+}
+
+[Serializable]
+public class TouchControlInfo {
+    public int touchID;
+    public PlaneControl detectedPlane;
+    public Airport detectedAirport;
 }

@@ -24,13 +24,7 @@
 
 public static class GPGSIds
 {
-        public const string achievement_20_planes_landed = "CggIqfyayhMQAhAD"; // <GPGSID>
-        public const string achievement_100_planes_landed = "CggIqfyayhMQAhAF"; // <GPGSID>
-        public const string achievement_first_plane_landed = "CggIqfyayhMQAhAB"; // <GPGSID>
-        public const string achievement_200_planes_landed = "CggIqfyayhMQAhAG"; // <GPGSID>
-        public const string achievement_50_planes_landed = "CggIqfyayhMQAhAE"; // <GPGSID>
-        public const string leaderboard_leaderboard = "CggIqfyayhMQAhAC"; // <GPGSID>
-        public const string achievement_500_planes_landed = "CggIqfyayhMQAhAH"; // <GPGSID>
+        public const string leaderboard_most_total_landed_planes = "CggIqfyayhMQAhAB"; // <GPGSID>
 
 }
 

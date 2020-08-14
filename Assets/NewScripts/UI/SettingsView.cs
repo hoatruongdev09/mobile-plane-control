@@ -32,7 +32,9 @@ public class SettingsView : UiView {
         if (PlayerSection.Instance == null) { return; }
         PlayerSection.Instance.PlayerData.settingData.useVibrate = !PlayerSection.Instance.PlayerData.settingData.useVibrate;
         if (PlayerSection.Instance.PlayerData.settingData.useVibrate) {
+#if UNITY_ANDROID || UNITY_IOS
             Handheld.Vibrate ();
+#endif
             AnimateOn (buttonVibrate);
         } else {
             AnimateOff (buttonVibrate);

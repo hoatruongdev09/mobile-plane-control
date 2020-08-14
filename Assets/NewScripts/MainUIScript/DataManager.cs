@@ -40,8 +40,8 @@ public class DataManager : MonoBehaviour {
             playerData = new PlayerData ();
             playerData.savedVersion = Application.version;
             playerData.totalPlaneLanded = 0;
-            playerData.unlockedLevel = new string[] { "Island" };
-            playerData.lastPlayedLevelID = "Island 2";
+            playerData.unlockedLevel = new string[] { "Island", "Island 2" };
+            playerData.lastPlayedLevelID = "Island";
             var saveJsonData = JsonUtility.ToJson (playerData);
             PlayerPrefs.SetString ("player-data", saveJsonData);
             return playerData;

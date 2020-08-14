@@ -4,8 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace NewScript {
     public class Path : MonoBehaviour {
-        public PlaneControl Controller { get; set; }
+        public PlaneControl Controller {
+            get { return planeControl; }
+            set { planeControl = value; }
+        }
         public float pointDistance = 3;
+        [SerializeField] private PlaneControl planeControl;
         public int CurrentPointCount {
             get { return lineVisual.positionCount; }
             set { if (value >= 0) { lineVisual.positionCount = value; } }

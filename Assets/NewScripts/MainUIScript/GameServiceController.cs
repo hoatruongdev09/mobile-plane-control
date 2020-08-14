@@ -28,6 +28,7 @@ public class GameServiceController : MonoBehaviour {
 #if UNITY_ANDROID
         PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder ().RequestIdToken ().Build ();
         PlayGamesPlatform.InitializeInstance (config);
+        PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate ();
 #endif
 #if UNITY_IOS
@@ -37,17 +38,20 @@ public class GameServiceController : MonoBehaviour {
 
     public void Authenticate () {
         if (Social.localUser.authenticated) { return; }
-#if UNITY_ANDROID
-        PlayGamesPlatform.Instance.Authenticate (SignInInteractivity.CanPromptOnce, (result) => {
-            Debug.Log ($"android sign in result: {result.ToString()}");
+        Social.localUser.Authenticate ((success, info) => {
+            Debug.Log ($"Sign in :{success} : {info}");
         });
+        // #if UNITY_ANDROID
+        //         PlayGamesPlatform.Instance.Authenticate (SignInInteractivity.CanPromptAlways, (result) => {
+        //             Debug.Log ($"android sign in result: {result.ToString()}");
+        //         });
 
-#endif
-#if UNITY_IOS
-        Social.localUser.Authenticate ((action) => {
-            Debug.Log ($"login stats: {action}");
-        });
-#endif
+        // #endif
+        // #if UNITY_IOS
+        //         Social.localUser.Authenticate ((action) => {
+        //             Debug.Log ($"login stats: {action}");
+        //         });
+        // #endif
 
     }
 
@@ -79,6 +83,7 @@ public class GameServiceController : MonoBehaviour {
     }
     public void ShowLeaderboardUI (Action<bool> callback = null) {
         if (!Social.localUser.authenticated) {
+            Debug.Log ("user not signed in");
             if (callback != null) callback (false);
             return;
         }
@@ -87,6 +92,7 @@ public class GameServiceController : MonoBehaviour {
     }
     public void ShowAchievemenUI (Action<bool> callback = null) {
         if (!Social.localUser.authenticated) {
+            Debug.Log ("user not signed in");
             if (callback != null) callback (false);
             return;
         }

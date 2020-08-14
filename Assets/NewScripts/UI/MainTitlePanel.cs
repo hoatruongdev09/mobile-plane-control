@@ -24,6 +24,7 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
     public MapSelectView mapSelectView;
     public ShopView shopView;
     private UiView CurrentView;
+    private UiView currentLayerView;
     private void Start () {
         StartCoroutine (InitializeCoroutine ());
     }
@@ -59,9 +60,11 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
         });
     }
     private void OpenView (UiView view) {
+        currentLayerView = view;
         view.Show ();
     }
     private void CloseView (UiView view) {
+        currentLayerView = null;
         view.Hide ();
     }
     private void Enter () {
@@ -187,7 +190,7 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
     }
 
     public void OnPurchaseFailed (Product i, PurchaseFailureReason p) {
-        if (i.definition.id == $"{PurchaseController.Instance.UnlockLevelID}City") {
+        if (i.definition.id.Contains (PurchaseController.Instance.UnlockAllLevelsdID)) {
             mapSelectView.ShowUnlockResult ("Unlock failed", $"{ParsePurchaseErrorToString(p)}");
             return;
         }

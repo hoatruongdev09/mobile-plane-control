@@ -70,9 +70,23 @@ public class Airport : MonoBehaviour {
                 Delegate?.OnAddLandingPlane ();
             }
         }
-        // else {
-        //     // Debug.Log ("remove plane to landing");
-        // }
+    }
+    public void MultitouchRecord (Vector3 point, NewScript.Path path, int touchIndex) {
+        if (path.Controller.PlaneTag != PlaneTag) { return; }
+        if (points == null || points.Count == 0) {
+            points = new List<Vector3> ();
+            points.Add (point);
+        }
+        if (points.Count < maxPointRecord) {
+            if ((point - points[points.Count - 1]).sqrMagnitude > Mathf.Pow (thresholdToLand, 2)) {
+                points.Add (point);
+            }
+        }
+        if (points.Count >= 2) {
+            if (CheckDirectToLand (points.ToArray ())) {
+                Delegate?.OnAddLandingPlane (touchIndex);
+            }
+        }
     }
     public virtual List<Vector3> GetLandingPoint () {
         Vector3 point1 = transform.TransformPoint (new Vector3 (0, 1));
@@ -127,6 +141,7 @@ public class Airport : MonoBehaviour {
     }
 }
 public interface IAirportDelegate {
+    void OnAddLandingPlane (int touchIndex);
     void OnAddLandingPlane ();
 
 }
