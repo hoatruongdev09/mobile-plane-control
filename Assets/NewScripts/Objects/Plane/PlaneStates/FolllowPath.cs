@@ -31,7 +31,7 @@ public class FolllowPath : PlaneState {
     }
 
     protected virtual void FollowPath () {
-        currentPath.SetFirstIndexPosition (transform.position);
+        currentPath.SetFirstIndexPosition (controller.planeAnchor.transform.position);
         CalculateDirect ();
         UpdateTransform ();
         if (controller.IsReadyToLand) {
@@ -54,7 +54,8 @@ public class FolllowPath : PlaneState {
     }
     protected virtual void UpdateTransform () {
         transform.position = Vector3.MoveTowards (transform.position, nextPosition, StateManager.Controller.MoveSpeed * Time.smoothDeltaTime);
-        transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, CalculateRotation (moveDirect)), StateManager.Controller.TurnSpeed * Time.smoothDeltaTime);
+        float angle = CalculateRotation (moveDirect / 2);
+        transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, angle), (StateManager.Controller.TurnSpeed + Mathf.Abs (angle / 60)) * Time.smoothDeltaTime);
     }
     protected virtual float CalculateRotation (Vector2 direct) {
         return Mathf.Atan2 (direct.y, direct.x) * Mathf.Rad2Deg - 90;

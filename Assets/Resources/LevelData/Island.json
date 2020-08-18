@@ -6,7 +6,12 @@
     "difficult": 1,
     "unlock": 0,
     "unlockType": 0,
-    "loadOption": { "sceneLoading": "default" }
+    "loadOption": { "sceneLoading": "default" },
+    "hasTutorial": true,
+    "tutorialData": {
+      "videoPath": "Tutorial-Basic",
+      "textTutorial": "HOW TO LAND A PLANE ?"
+    }
   },
   "levelBackground": {
     "background": "levels_island copy 7",

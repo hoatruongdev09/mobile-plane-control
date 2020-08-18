@@ -59,6 +59,12 @@ namespace NewScript {
                 throw e;
             }
         }
+        public Vector3 GetPointBy (int index) {
+            if (index >= CurrentPointCount || index < 0) {
+                throw new Exception ($"index {index} out of bound");
+            }
+            return lineVisual.GetPosition (index);
+        }
         public Vector3 GetNextPoint (int index) {
             Vector3 position;
             if (index + 1 >= CurrentPointCount) {

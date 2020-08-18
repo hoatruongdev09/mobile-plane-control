@@ -6,7 +6,12 @@
     "difficult": 4,
     "unlock": 1500,
     "unlockType": 0,
-    "loadOption": { "sceneLoading": "default" }
+    "loadOption": { "sceneLoading": "default" },
+    "hasTutorial": true,
+    "tutorialData": {
+      "videoPath": "Tutorial-Tornado",
+      "textTutorial": "AVOID HURRICANES !"
+    }
   },
   "levelBackground": {
     "background": "fix levels preview-08",

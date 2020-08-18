@@ -6,7 +6,9 @@
     "difficult": 3,
     "unlock": 150,
     "unlockType": 0,
-    "loadOption": { "sceneLoading": "default" }
+    "loadOption": { "sceneLoading": "default" },
+    "hasTutorial": false,
+    "tutorialData": null
   },
   "levelBackground": {
     "background": "levels_island copy 7",

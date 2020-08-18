@@ -22,6 +22,7 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
     public StatView statView;
     public SettingsView settingsView;
     public MapSelectView mapSelectView;
+    public TutorialView tutorialView;
     public ShopView shopView;
     private UiView CurrentView;
     private UiView currentLayerView;
@@ -92,6 +93,7 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
         buttonStats.transform.SetSiblingIndex (bookImage.transform.GetSiblingIndex () - 1);
         buttonTutorials.transform.SetSiblingIndex (bookImage.transform.GetSiblingIndex () + 1);
         buttonSettings.transform.SetSiblingIndex (bookImage.transform.GetSiblingIndex () - 1);
+        ChangeView (tutorialView);
     }
     private void ButtonSetting () {
         buttonStats.transform.SetSiblingIndex (bookImage.transform.GetSiblingIndex () - 1);

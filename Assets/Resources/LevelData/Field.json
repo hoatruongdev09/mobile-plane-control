@@ -6,7 +6,12 @@
     "difficult": 2,
     "unlock": 400,
     "unlockType": 0,
-    "loadOption": { "sceneLoading": "default" }
+    "loadOption": { "sceneLoading": "default" },
+    "hasTutorial": true,
+    "tutorialData": {
+      "videoPath": "Tutorial-Fire",
+      "textTutorial": "HOW TO EXTINGUISH A FIRE ?"
+    }
   },
   "levelBackground": {
     "background": "levels_island copy 7",

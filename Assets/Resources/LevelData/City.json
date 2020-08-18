@@ -6,7 +6,9 @@
     "difficult": 5,
     "unlock": 2000,
     "unlockType": 0,
-    "loadOption": { "sceneLoading": "default" }
+    "loadOption": { "sceneLoading": "default" },
+    "hasTutorial": false,
+    "tutorialData": null
   },
   "levelBackground": {
     "background": "fix levels-2",

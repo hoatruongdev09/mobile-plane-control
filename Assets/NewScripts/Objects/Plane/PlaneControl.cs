@@ -67,6 +67,7 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
     private bool isEnterMap = true;
     private float baseSpeed;
     private float baseTurnSpeed;
+    public GameObject planeAnchor;
     private void Start () {
         Init ();
         stateMachine = new StateMachine ();
@@ -88,6 +89,9 @@ public class PlaneControl : MonoBehaviour, ITriggerCheckerDelegate, ICollisionCh
 
         baseSpeed = MoveSpeed;
         baseTurnSpeed = TurnSpeed;
+        planeAnchor = new GameObject ("anchor");
+        planeAnchor.transform.SetParent (transform);
+        planeAnchor.transform.localPosition = new Vector3 (0, 2f, 0);
     }
     private void Update () {
         stateMachine.CurrentState?.Update ();

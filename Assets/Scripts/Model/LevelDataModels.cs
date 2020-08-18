@@ -17,6 +17,12 @@ public class LevelDataModel {
 }
 
 [Serializable]
+public class TutorialData {
+    public string videoPath;
+    public string textTutorial;
+}
+
+[Serializable]
 public class MapImageModel {
     public string background;
     public VectorModel position;
@@ -38,6 +44,9 @@ public class LevelDataInfo {
     public int unlock = 150;
     public int unlockType = 0;
     public LevelLoadOption loadOption;
+
+    public bool hasTutorial = false;
+    public TutorialData tutorialData = null;
 
     public enum UnlockType { landed, adsWatched, buy }
 }

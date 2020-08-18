@@ -41,21 +41,37 @@ public class GameInitState : GameState {
     }
 
     public override void Enter () {
-        controller.StartCoroutine (DelayStartGame (() => {
-            stateManager.StateMachine.ChangeState (stateManager.StartedState, new {
-                flags = new {
-                        hasEnemy = hasEnemy,
-                            hasFire = hasFire,
-                            hasCloud = hasCloud,
-                            hasTornado = hasTornado,
-                            hasFuel = hasFuel,
-                    },
-                    difficult = levelDifficultData,
-                    info = levelInfo
-            });
-        }));
+        controller.StartCoroutine (DelayStartGame (StartGame, StartGameTutorial));
     }
-
+    private void StartGame () {
+        stateManager.StateMachine.ChangeState (stateManager.StartedState, new {
+            flags = new {
+                    hasEnemy = hasEnemy,
+                        hasFire = hasFire,
+                        hasCloud = hasCloud,
+                        hasTornado = hasTornado,
+                        hasFuel = hasFuel,
+                },
+                difficult = levelDifficultData,
+                info = levelInfo
+        });
+    }
+    private void StartGameTutorial () {
+        stateManager.StateMachine.ChangeState (stateManager.TutorialState, new {
+            gamePlayData = new {
+                    flags = new {
+                            hasEnemy = hasEnemy,
+                                hasFire = hasFire,
+                                hasCloud = hasCloud,
+                                hasTornado = hasTornado,
+                                hasFuel = hasFuel,
+                        },
+                        difficult = levelDifficultData,
+                        info = levelInfo
+                },
+                tutorialData = this.levelInfo.tutorialData
+        });
+    }
     public override void Exit () {
         scoreController.onBestFireExtinguishedChange -= uiManager.viewGamePanel.SetBestFireExtinguished;
         scoreController.onBestScoreChanges -= uiManager.viewGamePanel.SetHighScore;
@@ -155,10 +171,13 @@ public class GameInitState : GameState {
         }
         return listAirports;
     }
-    private IEnumerator DelayStartGame (Action callback) {
+    private IEnumerator DelayStartGame (Action callbackWithNoTutorial, Action callbackWithTutorial) {
         yield return new WaitUntil (() => levelLoaded == true);
-        Debug.Log ("Wtf");
-        callback ();
+        if (levelInfo.hasTutorial) {
+            callbackWithTutorial ();
+        } else {
+            callbackWithNoTutorial ();
+        }
     }
     private IEnumerator DelayStartGame (float time, Action callback) {
         yield return new WaitForSecondsRealtime (time);

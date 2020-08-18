@@ -57,13 +57,14 @@ public class GameController : MonoBehaviour {
         }
         yield return new WaitForEndOfFrame ();
         stateMachine.Start (stateManager.InitState, new { level = selectedLevel, difficult = selectedDifficult });
-        yield return new WaitUntil (() => CrossSceneData.Instance != null);
-        yield return new WaitUntil (() => AdsController.Instance != null);
+        // yield return new WaitUntil (() => CrossSceneData.Instance != null);
+        // yield return new WaitUntil (() => AdsController.Instance != null);
         adsController = AdsController.Instance;
+        Debug.LogWarning ($"ads control: {adsController == null}");
         Debug.Log ($"is remove ad: {CrossSceneData.Instance.IsRemoveAd}");
-        if (!CrossSceneData.Instance.IsRemoveAd) {
-            adsController.RequestBannerAd ();
-            adsController.ShowBannerAd ();
+        if (CrossSceneData.Instance && !CrossSceneData.Instance.IsRemoveAd) {
+            adsController?.RequestBannerAd ();
+            adsController?.ShowBannerAd ();
         }
     }
 }

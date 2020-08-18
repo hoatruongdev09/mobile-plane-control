@@ -63,12 +63,15 @@ public class GameOverState : GameState, IGameOverPanelDelegate, IRewardAdDelegat
         uIManager.ChangePanel (uIManager.viewGamePanel);
     }
     private void InitializeAdControl () {
+        adsController = controller.adsController;
         if (adsController == null) {
-            adsController = controller.adsController;
-            adsController.RewardAdDelegate = this;
-            if (!adsController.RewardAdLoaded ()) {
-                adsController.RequestRewardAd ();
-            }
+            controller.uiManager.viewGameOverPanel.DisableWatchAdButton ();
+            return;
+        }
+
+        adsController.RewardAdDelegate = this;
+        if (!adsController.RewardAdLoaded ()) {
+            adsController.RequestRewardAd ();
         }
     }
     private void LoadScore () {

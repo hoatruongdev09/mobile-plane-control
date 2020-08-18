@@ -5,6 +5,7 @@ public class GameStateManager {
 
     public GameInitState InitState { get; private set; }
     public GameStartedState StartedState { get { return startedState; } private set { startedState = value; } }
+    public GameTutorialState TutorialState { get; private set; }
     public GamePauseState PauseState { get; private set; }
     public GameOverState OverState { get; private set; }
 
@@ -20,5 +21,6 @@ public class GameStateManager {
         StartedState = new GameStartedState (this);
         PauseState = new GamePauseState (this);
         OverState = new GameOverState (this);
+        TutorialState = new GameTutorialState (this);
     }
 }

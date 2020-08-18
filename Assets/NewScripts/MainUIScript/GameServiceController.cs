@@ -20,9 +20,9 @@ public class GameServiceController : MonoBehaviour {
             Instance = this;
         }
     }
-    private void Start () {
-        Initialize ();
-    }
+    // private void Start () {
+    //     // Initialize ();
+    // }
 
     private void Initialize () {
 #if UNITY_ANDROID
