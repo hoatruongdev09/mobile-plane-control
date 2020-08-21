@@ -10,14 +10,14 @@ public class AdsController : MonoBehaviour {
     public IBannerAdDelegate BannerAdDelegate { get; set; }
 
 #if UNITY_ANDROID
-    public string rewardedAdUnit = "ca-app-pub-3940256099942544/5224354917";
-    public string bannerAdUnit = "ca-app-pub-3940256099942544/6300978111";
+    private string rewardedAdUnit = "ca-app-pub-1857579585945039/7469462805";
+    private string bannerAdUnit = "ca-app-pub-1857579585945039/2127127477";
 #elif UNITY_IOS
-    public string rewardedAdUnit = "ca-app-pub-3940256099942544/1712485313";
-    public string bannerAdUnit = "ca-app-pub-3940256099942544/2934735716";
+    private string rewardedAdUnit = "ca-app-pub-1857579585945039/7187882465";
+    private string bannerAdUnit = "ca-app-pub-1857579585945039/5274544305";
 #else 
-    public string rewardedAdUnit = "";
-    public string bannerAdUnit = "";
+    private string rewardedAdUnit = "";
+    private string bannerAdUnit = "";
 #endif
 
     private RewardedAd rewardedAd;
