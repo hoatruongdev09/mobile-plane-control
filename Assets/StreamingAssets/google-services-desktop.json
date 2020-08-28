@@ -1,0 +1,37 @@
+{
+  "client": [
+    {
+      "services": {
+        "appinvite_service": {
+          "status": 1
+        }, 
+        "analytics_service": {
+          "status": 0
+        }
+      }, 
+      "oauth_client": [
+        {
+          "client_id": "5255904809-bj90b7jnjmvdrho4nllj5tn2crricah3.apps.googleusercontent.com"
+        }
+      ], 
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIqWc09YBAXYc50rOp3Eab4ExymJ7ZRAY"
+        }
+      ], 
+      "client_info": {
+        "mobilesdk_app_id": "1:5255904809:ios:9dc6863b4f160b75e22638", 
+        "android_client_info": {
+          "package_name": "com.stdiogame.planecontrol"
+        }
+      }
+    }
+  ], 
+  "configuration_version": "1", 
+  "project_info": {
+    "storage_bucket": "landing-control-6336467.appspot.com", 
+    "project_id": "landing-control-6336467", 
+    "firebase_url": "https://landing-control-6336467.firebaseio.com", 
+    "project_number": "5255904809"
+  }
+}

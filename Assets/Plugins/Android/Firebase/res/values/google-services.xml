@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources tools:keep="@string/firebase_database_url,@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id,@string/default_web_client_id" xmlns:tools="http://schemas.android.com/tools">
+  <string name="firebase_database_url" translatable="false">https://landing-control-6336467.firebaseio.com</string>
+  <string name="gcm_defaultSenderId" translatable="false">5255904809</string>
+  <string name="google_storage_bucket" translatable="false">landing-control-6336467.appspot.com</string>
+  <string name="project_id" translatable="false">landing-control-6336467</string>
+  <string name="google_api_key" translatable="false">AIzaSyDBLjfUXV8yxCJve8cVSFkkHQDoqiWy8hA</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDBLjfUXV8yxCJve8cVSFkkHQDoqiWy8hA</string>
+  <string name="google_app_id" translatable="false">1:5255904809:android:3e560c604206b96ee22638</string>
+  <string name="default_web_client_id" translatable="false">5255904809-4f6ib0tijfeonk7qc3pmqp1p0te8perv.apps.googleusercontent.com</string>
+</resources>

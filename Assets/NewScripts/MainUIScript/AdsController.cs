@@ -85,18 +85,22 @@ public class AdsController : MonoBehaviour {
 
     #region REWARD AD
     private void InitializeRewardAd () {
+        try {
+            this.rewardedAd.OnAdLoaded -= HandleRewardedAdLoaded;
+            this.rewardedAd.OnAdFailedToLoad -= HandleRewardedAdFailedToLoad;
+            this.rewardedAd.OnAdOpening -= HandleRewardedAdOpening;
+            this.rewardedAd.OnAdFailedToShow -= HandleRewardedAdFailedToShow;
+            this.rewardedAd.OnUserEarnedReward -= HandleUserEarnedReward;
+            this.rewardedAd.OnAdClosed -= HandleRewardedAdClosed;
+        } catch (Exception e) {
+
+        }
         rewardedAd = new RewardedAd (rewardedAdUnit);
-        // Called when an ad request has successfully loaded.
         this.rewardedAd.OnAdLoaded += HandleRewardedAdLoaded;
-        // Called when an ad request failed to load.
         this.rewardedAd.OnAdFailedToLoad += HandleRewardedAdFailedToLoad;
-        // Called when an ad is shown.
         this.rewardedAd.OnAdOpening += HandleRewardedAdOpening;
-        // Called when an ad request failed to show.
         this.rewardedAd.OnAdFailedToShow += HandleRewardedAdFailedToShow;
-        // Called when the user should be rewarded for interacting with the ad.
         this.rewardedAd.OnUserEarnedReward += HandleUserEarnedReward;
-        // Called when the ad is closed.
         this.rewardedAd.OnAdClosed += HandleRewardedAdClosed;
     }
     public void HandleRewardedAdLoaded (object sender, EventArgs args) {

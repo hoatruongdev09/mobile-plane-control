@@ -51,7 +51,12 @@ public class PurchaseController : MonoBehaviour {
         builder.AddProduct (unlockAllLevel, ProductType.NonConsumable);
         foreach (var level in listLevelName) {
             var normalLevelName = level.Replace (" ", ".");
+            var productName = $"{unlockLevel}{normalLevelName.ToLower()}";
             Debug.Log ($"init product: {unlockLevel}{normalLevelName.ToLower()}");
+            if (productName == "unlock_level_island" || productName == "unlock_level_island.2") {
+                Debug.Log ($"not add product: {productName}");
+                continue;
+            }
             builder.AddProduct ($"{unlockLevel}{normalLevelName.ToLower()}", ProductType.NonConsumable);
         }
         StoreListener = listener;

@@ -23,9 +23,11 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
     public SettingsView settingsView;
     public MapSelectView mapSelectView;
     public TutorialView tutorialView;
+    public PanelLoadIndicator panelLoadIndicator;
     public ShopView shopView;
     private UiView CurrentView;
-    private UiView currentLayerView;
+
+    private bool isTimout = false;
     private void Start () {
         StartCoroutine (InitializeCoroutine ());
     }
@@ -61,11 +63,9 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
         });
     }
     private void OpenView (UiView view) {
-        currentLayerView = view;
         view.Show ();
     }
     private void CloseView (UiView view) {
-        currentLayerView = null;
         view.Hide ();
     }
     private void Enter () {
@@ -118,6 +118,14 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
     }
     public void OnItemQuickUnlock (int id) {
         if (Datasource == null) { return; }
+        OpenView (panelLoadIndicator);
+        StartCoroutine (CheckForServiceTimeOut (30));
+        if (!PurchaseController.Instance.IsInitialized) {
+            var announcerView = CreateAnnouncerView ("Oops!", "Service currently not available", panelLoadIndicator.transform);
+            announcerView.onHideEvent += (() => CloseView (panelLoadIndicator));
+            OpenView (announcerView);
+            return;
+        }
         var levelInfo = Datasource.GetMapInfoByID (id);
         Debug.Log ($"prepare purchase {levelInfo.mapName}");
         PurchaseController.Instance?.PurchaseLevel (levelInfo.mapName);
@@ -160,10 +168,27 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
 
     public void OnPurchaseRemoveAd () {
         Debug.Log ("purchase ad");
+        OpenView (panelLoadIndicator);
+        StartCoroutine (CheckForServiceTimeOut (30));
+        if (!PurchaseController.Instance.IsInitialized) {
+            var announcerView = CreateAnnouncerView ("Oops!", "Service currently not available", panelLoadIndicator.transform);
+            announcerView.onHideEvent += (() => CloseView (panelLoadIndicator));
+            announcerView.Show ();
+            return;
+        }
         PurchaseController.Instance.PurchaseRemoveAd ();
     }
     public void OnPurchaseUnlockAllLevel () {
         Debug.Log ("purchase all level");
+        OpenView (panelLoadIndicator);
+        StartCoroutine (CheckForServiceTimeOut (30));
+        if (!PurchaseController.Instance.IsInitialized) {
+            var announcerView = CreateAnnouncerView ("Oops!", "Service currently not available", panelLoadIndicator.transform);
+            announcerView.onHideEvent += (() => CloseView (panelLoadIndicator));
+            announcerView.Show ();
+            isTimout = false;
+            return;
+        }
         PurchaseController.Instance.PurchaseUnlockAllLevels ();
     }
     public void OnInitializeFailed (InitializationFailureReason error) {
@@ -171,32 +196,62 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
     }
 
     public PurchaseProcessingResult ProcessPurchase (PurchaseEventArgs e) {
+        Debug.Log ("run process purchase ");
         var purchaseProductId = e.purchasedProduct.definition.id;
         if (purchaseProductId == PurchaseController.Instance.RemoveAdID) {
             Debug.Log ("remove ad purchased");
             shopView.DisableButtonRemoveAd ();
             CrossSceneData.Instance.IsRemoveAd = true;
-            shopView.ShowPurchaseResult ("Purchase Complete", "Ads are removed !");
+            var announcerView = CreateAnnouncerView ("Purchase Complete", "Ads are removed !", panelLoadIndicator.transform);
+            announcerView.onHideEvent += (() => CloseView (panelLoadIndicator));
+            OpenView (announcerView);
+            return PurchaseProcessingResult.Complete;
         } else if (purchaseProductId == PurchaseController.Instance.UnlockAllLevelsdID) {
             Debug.Log ("unlock all world purchased");
             shopView.DisableButtonUnlockAllLevel ();
-            shopView.ShowPurchaseResult ("Purchase Complete", "All level unlocked !");
+            var announcerView = CreateAnnouncerView ("Purchase Complete", "All level unlocked !", panelLoadIndicator.transform);
+            announcerView.onHideEvent += (() => CloseView (panelLoadIndicator));
+            OpenView (announcerView);
+            return PurchaseProcessingResult.Complete;
         } else if (purchaseProductId.Contains (PurchaseController.Instance.UnlockLevelID)) {
             var levelName = purchaseProductId.Replace (PurchaseController.Instance.UnlockLevelID, "").Replace (".", " ").ToLower ();
             levelName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase (levelName.ToLower ());
-            mapSelectView.ShowUnlockResult ("Unlock completed", $"{levelName} is available to play !");
+            var announcerView = CreateAnnouncerView ("Unlock completed", $"{levelName} is available to play !", panelLoadIndicator.transform);
+            announcerView.onHideEvent += (() => CloseView (panelLoadIndicator));
+            OpenView (announcerView);
             PlayerSection.Instance.AddUnlockedLevel (levelName);
+            return PurchaseProcessingResult.Complete;
         }
-        Debug.Log ($"product id: ${purchaseProductId.Contains("unlock_level_")}");
-        return PurchaseProcessingResult.Complete;
+        Debug.Log ($"product id: ${purchaseProductId} pending");
+        isTimout = false;
+        return PurchaseProcessingResult.Pending;
     }
 
     public void OnPurchaseFailed (Product i, PurchaseFailureReason p) {
-        if (i.definition.id.Contains (PurchaseController.Instance.UnlockAllLevelsdID)) {
-            mapSelectView.ShowUnlockResult ("Unlock failed", $"{ParsePurchaseErrorToString(p)}");
-            return;
-        }
-        shopView.ShowPurchaseResult ("Purchase Failed", $"{ParsePurchaseErrorToString(p)}");
+        var announcerView = CreateAnnouncerView ("Purchase failed !", $"{ParsePurchaseErrorToString(p)}", panelLoadIndicator.transform);
+        announcerView.onHideEvent = null;
+        announcerView.onHideEvent += (() => CloseView (panelLoadIndicator));
+        announcerView.Show ();
+        isTimout = false;
+    }
+    public NotificationAnnouncerView CreateAnnouncerView (string title, string content, Transform parent) {
+        NotificationAnnouncerView announcerPrefab = Resources.Load<NotificationAnnouncerView> ("UI/PanelPurchaseResult");
+        var announcer = Instantiate (announcerPrefab, transform);
+        announcer.transform.SetParent (transform);
+        announcer.transform.localScale = Vector2.one;
+        announcer.textTitle.text = title;
+        announcer.textTextContent.text = content;
+        // announcer.Show ();
+        return announcer;
+    }
+    private IEnumerator CheckForServiceTimeOut (float time) {
+        yield return new WaitForSecondsRealtime (time);
+        if (isTimout) { yield break; }
+        isTimout = true;
+        var announcerView = CreateAnnouncerView ("Oops!", "Something wrong happened.", panelLoadIndicator.transform);
+        announcerView.onHideEvent += (() => CloseView (panelLoadIndicator));
+        announcerView.Show ();
+        isTimout = false;
     }
     private string ParsePurchaseErrorToString (PurchaseFailureReason p) {
         return Regex.Replace (p.ToString (), "([a-z])([A-Z])", "$1 $2");
@@ -208,10 +263,8 @@ public class MainTitlePanel : UiView, IMapSelectViewDelegate, IShopViewDelegate,
 
         if (controller.products.WithID (PurchaseController.Instance.RemoveAdID).hasReceipt) {
             shopView.DisableButtonRemoveAd ();
-            Debug.Log ("WTFF REMOVE AD ?");
             CrossSceneData.Instance.IsRemoveAd = true;
         } else if (controller.products.WithID (PurchaseController.Instance.RemoveAdID).hasReceipt) {
-            Debug.Log ("unlocked all world");
             shopView.DisableButtonUnlockAllLevel ();
         }
     }

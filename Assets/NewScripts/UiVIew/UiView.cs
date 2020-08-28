@@ -5,10 +5,12 @@ using UnityEngine;
 public abstract class UiView : MonoBehaviour {
     public CanvasGroup canvasGroup;
     public virtual void Show () {
+        if (gameObject.activeSelf) { return; }
         gameObject.SetActive (true);
         AnimateShow (() => { });
     }
     public virtual void Hide () {
+        if (!gameObject.activeSelf) { return; }
         AnimateHide (() => {
             gameObject.SetActive (false);
         });
