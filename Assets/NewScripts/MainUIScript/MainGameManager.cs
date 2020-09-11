@@ -17,6 +17,7 @@ public class MainGameManager : MonoBehaviour, IMapSelectViewDatasource, IMainTit
         }
     }
     private void Start () {
+        Application.targetFrameRate = 300;
         dataManager = DataManager.Instance;
         mainUiManager.mainTitlePanel.mapSelectView.Datasource = this;
         mainUiManager.mainTitlePanel.Datasource = this;
