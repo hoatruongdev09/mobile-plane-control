@@ -198,7 +198,7 @@ TextureImporter:
       213: 21300128
     second: in-air-collision_24
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -215,9 +215,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -226,9 +229,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -249,10 +252,15 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 1
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -264,6 +272,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   - serializedVersion: 3
@@ -276,6 +285,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   - serializedVersion: 3
@@ -288,6 +298,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   - serializedVersion: 3
@@ -300,6 +311,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   - serializedVersion: 3
@@ -312,6 +324,20 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   spriteSheet:
@@ -1692,9 +1718,74 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-  spritePackingTag: 
+    nameFileIdTable:
+      in-air-collision_0: 21300000
+      in-air-collision_1: 21300002
+      in-air-collision_10: 21300112
+      in-air-collision_102: 21300086
+      in-air-collision_103: 21300088
+      in-air-collision_107: 21300090
+      in-air-collision_108: 21300092
+      in-air-collision_109: 21300094
+      in-air-collision_11: 21300114
+      in-air-collision_111: 21300096
+      in-air-collision_112: 21300098
+      in-air-collision_113: 21300100
+      in-air-collision_119: 21300102
+      in-air-collision_12: 21300116
+      in-air-collision_13: 21300118
+      in-air-collision_14: 21300120
+      in-air-collision_15: 21300122
+      in-air-collision_16: 21300124
+      in-air-collision_17: 21300012
+      in-air-collision_18: 21300126
+      in-air-collision_19: 21300014
+      in-air-collision_2: 21300104
+      in-air-collision_20: 21300016
+      in-air-collision_21: 21300018
+      in-air-collision_22: 21300020
+      in-air-collision_23: 21300022
+      in-air-collision_24: 21300128
+      in-air-collision_3: 21300004
+      in-air-collision_33: 21300024
+      in-air-collision_34: 21300026
+      in-air-collision_35: 21300028
+      in-air-collision_36: 21300030
+      in-air-collision_4: 21300006
+      in-air-collision_40: 21300032
+      in-air-collision_41: 21300034
+      in-air-collision_42: 21300036
+      in-air-collision_46: 21300038
+      in-air-collision_47: 21300040
+      in-air-collision_48: 21300042
+      in-air-collision_5: 21300008
+      in-air-collision_50: 21300044
+      in-air-collision_56: 21300046
+      in-air-collision_58: 21300048
+      in-air-collision_6: 21300010
+      in-air-collision_64: 21300050
+      in-air-collision_65: 21300052
+      in-air-collision_66: 21300054
+      in-air-collision_67: 21300056
+      in-air-collision_7: 21300106
+      in-air-collision_70: 21300058
+      in-air-collision_71: 21300060
+      in-air-collision_72: 21300062
+      in-air-collision_76: 21300064
+      in-air-collision_78: 21300066
+      in-air-collision_8: 21300108
+      in-air-collision_82: 21300068
+      in-air-collision_83: 21300070
+      in-air-collision_86: 21300072
+      in-air-collision_87: 21300074
+      in-air-collision_9: 21300110
+      in-air-collision_95: 21300076
+      in-air-collision_96: 21300078
+      in-air-collision_97: 21300080
+      in-air-collision_98: 21300082
+      in-air-collision_99: 21300084
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

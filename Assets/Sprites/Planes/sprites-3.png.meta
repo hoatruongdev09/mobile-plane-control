@@ -204,7 +204,7 @@ TextureImporter:
       213: 21300132
     second: sprites-3_26
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -221,9 +221,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -232,9 +235,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -255,10 +258,15 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 1
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -270,6 +278,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   - serializedVersion: 3
@@ -282,6 +291,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   - serializedVersion: 3
@@ -294,6 +304,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   - serializedVersion: 3
@@ -306,6 +317,33 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   spriteSheet:
@@ -1266,9 +1304,54 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-  spritePackingTag: 
+    nameFileIdTable:
+      sprites-3_0: 21300000
+      sprites-3_1: 21300002
+      sprites-3_10: 21300018
+      sprites-3_11: 21300020
+      sprites-3_13: 21300024
+      sprites-3_14: 21300026
+      sprites-3_15: 21300028
+      sprites-3_17: 21300032
+      sprites-3_18: 21300034
+      sprites-3_2: 21300004
+      sprites-3_22: 21300042
+      sprites-3_24: 21300046
+      sprites-3_25: 21300048
+      sprites-3_26: 21300132
+      sprites-3_27: 21300050
+      sprites-3_28: 21300052
+      sprites-3_29: 21300114
+      sprites-3_3: 21300006
+      sprites-3_30: 21300054
+      sprites-3_31: 21300056
+      sprites-3_32: 21300058
+      sprites-3_33: 21300116
+      sprites-3_34: 21300060
+      sprites-3_35: 21300118
+      sprites-3_36: 21300062
+      sprites-3_37: 21300064
+      sprites-3_38: 21300066
+      sprites-3_39: 21300068
+      sprites-3_4: 21300008
+      sprites-3_40: 21300070
+      sprites-3_44: 21300076
+      sprites-3_47: 21300082
+      sprites-3_48: 21300084
+      sprites-3_5: 21300010
+      sprites-3_51: 21300090
+      sprites-3_52: 21300092
+      sprites-3_53: 21300094
+      sprites-3_56: 21300100
+      sprites-3_57: 21300102
+      sprites-3_58: 21300104
+      sprites-3_6: 21300012
+      sprites-3_61: 21300110
+      sprites-3_7: 21300014
+      sprites-3_8: 21300016
+      sprites-3_9: 21300130
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
