@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
-public class TutorPanelView : UiView {
+public class TutorPanelView : UiView
+{
     public Button.ButtonClickedEvent OnOkClickedEvent { get { return buttonOK.onClick; } set { buttonOK.onClick = value; } }
     public VideoPlayer videoPlayer;
     public RawImage videoRenderTarget;
@@ -11,64 +13,93 @@ public class TutorPanelView : UiView {
     public Text textTutorial;
     public string VideoPath { get; set; }
     public string TextTutorial { get { return textTutorial.text; } set { textTutorial.text = value; } }
-    private void Start () {
-        InitializeVideoPlayer ();
-        buttonOK.onClick.AddListener (ButtonOK);
+    private void Start()
+    {
+        InitializeVideoPlayer();
+        buttonOK.onClick.AddListener(ButtonOK);
     }
-    private void InitializeVideoPlayer () {
+    private void InitializeVideoPlayer()
+    {
         videoPlayer.loopPointReached += OnVideoPlayerFinished;
         videoPlayer.started += OnVideoStartPlayed;
     }
-    public override void Show () {
-        gameObject.SetActive (true);
-        AnimateShow (() => {
-            LoadVideoTutorial (VideoPath);
+    public override void Show()
+    {
+        gameObject.SetActive(true);
+        AnimateShow(() =>
+        {
+            LoadVideoTutorial(VideoPath);
         });
     }
-    public override void Hide () {
-        AnimateHide (() => {
-            videoPlayer.Stop ();
-            gameObject.SetActive (false);
+    public override void Hide()
+    {
+        AnimateHide(() =>
+        {
+            videoPlayer.Stop();
+            gameObject.SetActive(false);
         });
     }
-    private void ButtonOK () {
-        Hide ();
+    private void ButtonOK()
+    {
+        Hide();
     }
-    public void LoadVideoTutorial (string videoPath) {
-        var clip = LoadVideo (videoPath);
-        ShowClip (clip);
+    public void LoadVideoTutorial(string videoPath)
+    {
+        // var clip = LoadVideo(videoPath);
+        StartCoroutine(ShowClip(videoPath));
+        // ShowClip(clip);
     }
-    private void ShowClip (VideoClip clip) {
-        StartCoroutine (PlayTutorialCoroutine (clip));
+
+    private IEnumerator ShowClip(string videoPath)
+    {
+        videoPlayer.url = System.IO.Path.Combine(Application.streamingAssetsPath, $"videos/{videoPath}.mp4");
+        videoPlayer.waitForFirstFrame = true;
+        videoPlayer.Prepare();
+        yield return new WaitUntil(() => videoPlayer.isPrepared);
+        videoRenderTarget.texture = videoPlayer.texture;
+        videoRenderTarget.color = new Color(1, 1, 1, 1);
+        videoPlayer.isLooping = true;
+        videoPlayer.Play();
     }
-    public void SetTextTutorial (string text) {
+
+    private void ShowClip(VideoClip clip)
+    {
+        StartCoroutine(PlayTutorialCoroutine(clip));
+    }
+    public void SetTextTutorial(string text)
+    {
         textTutorial.text = text;
     }
-    private IEnumerator PlayTutorialCoroutine (VideoClip clip) {
-        PrepareVideoPlayer (clip);
-        yield return new WaitUntil (() => videoPlayer.isPrepared);
+    private IEnumerator PlayTutorialCoroutine(VideoClip clip)
+    {
+        PrepareVideoPlayer(clip);
+        yield return new WaitUntil(() => videoPlayer.isPrepared);
         videoRenderTarget.texture = videoPlayer.texture;
-        videoRenderTarget.color = new Color (1, 1, 1, 1);
+        videoRenderTarget.color = new Color(1, 1, 1, 1);
         videoPlayer.isLooping = true;
-        videoPlayer.Play ();
+        videoPlayer.Play();
     }
 
-    private VideoClip LoadVideo (string videoPath) {
-        Debug.Log ($"video path: {videoPath}");
-        VideoClip clip = Resources.Load<VideoClip> ($"tutorial-video/{videoPath}");
-        Debug.Log ($"video null: {clip == null}");
+    private VideoClip LoadVideo(string videoPath)
+    {
+        Debug.Log($"video path: {videoPath}");
+        VideoClip clip = Resources.Load<VideoClip>($"tutorial-video/{videoPath}");
+        Debug.Log($"video null: {clip == null}");
         return clip;
     }
-    private void PrepareVideoPlayer (VideoClip video) {
+    private void PrepareVideoPlayer(VideoClip video)
+    {
         videoPlayer.clip = video;
         videoPlayer.waitForFirstFrame = true;
-        videoPlayer.Prepare ();
+        videoPlayer.Prepare();
     }
-    private void OnVideoStartPlayed (VideoPlayer source) {
-        Debug.Log ("start played");
+    private void OnVideoStartPlayed(VideoPlayer source)
+    {
+        Debug.Log("start played");
     }
 
-    private void OnVideoPlayerFinished (VideoPlayer source) {
-        Debug.Log ("finish played");
+    private void OnVideoPlayerFinished(VideoPlayer source)
+    {
+        Debug.Log("finish played");
     }
 }
