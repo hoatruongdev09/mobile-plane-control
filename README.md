@@ -1,5 +1,6 @@
 # Airport Landing Challenge
-Welcome to Airport Landing Challenge! Test your skills as an air traffic controller, guiding planes to their designated landing lanes. Each level presents new challenges that will put your timing, precision, and decision-making to the test.
+
+Welcome to Airport Landing Challenge! Test your skills as an air traffic controller, guiding planes to their designated landing lanes. Each level presents new challenges that will put your timing, precision, and decision-making to the test. [Demo](https://hoatruongdev09.itch.io/air-traffic-controller)
 
 # Gameplay
 ![Alt Text](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExejJ1NXF5YXBtbGYwZWtkNmg5c3poaG82bTIxM2c2eWZocHNpcnFseCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/tdQQoOr4dnOWted3rn/giphy.gif)\
